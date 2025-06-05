@@ -1,0 +1,232 @@
+@import "tailwindcss";
+
+/* src/index.css */
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  overflow-x: hidden;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3em;
+  line-height: 1.1;
+}
+
+button {
+  border: 1px solid transparent;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #EAE7DC;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #213547;
+  }
+}
+
+/* App container styles */
+.app-container {
+  transition: background-color 0.3s ease;
+  height: 100%;
+}
+
+/* Base theme classes */
+.light {
+  background-color: oklch(92.2% 0 0);
+  color: #36454F;
+}
+
+.dark {
+  background-color: oklch(37.1% 0 0);
+  color: rgba(255, 255, 255, 0.87);
+}
+
+/* Element-specific text colors for light mode */
+.light h1, .light h2, .light h3 {
+  color: #262624; 
+}
+
+.light .dashboard-head {
+  background-color:rgb(255, 255, 255);
+  color: #262624; /* White text for dashboard head regardless of mode */
+}
+
+.light .dash-table-bg {
+  background-color:rgb(255, 255, 255);
+}
+
+.light .session-history-bg {
+  background-color:rgb(255, 255, 255); /* Light gray for session history in light mode */
+}
+
+.light .active-icon-bg {
+  background-color: #c7c4bc;
+}
+
+.light .sidebar {
+  background-color:rgb(255, 255, 255); /* Light gray for sidebar in light mode */
+  color: #262624; 
+}
+
+.light .message {
+  color: #00a43b;
+}
+
+.light .clock-display {
+  color: #262624; /* Dark blue for clock in light mode */
+}
+
+.light label {
+  color: #262624; /* Dark gray for labels in light mode */
+}
+
+/* Element-specific text colors for dark mode */
+
+.dark .dashboard-head {
+  background-color: oklch(20.5% 0 0);
+  color: #c7c4bc; /* White text for dashboard head regardless of mode */
+}
+
+.dark .dash-table-bg {
+  background-color: oklch(20.5% 0 0);
+  border: 1px solid 
+}
+
+.dark .session-history-bg {
+  background-color: #262624; /* Dark gray for session history in dark mode */
+  color:rgb(255, 255, 255); /* White text for session history in dark mode */
+}
+
+.dark .active-icon-bg {
+  background-color: #262624;
+}
+
+.dark input {
+  color: #c7c4bc; /* White text for inputs in dark mode */
+}
+
+.dark select {
+  color: #c7c4bc; /* White text for select elements in dark mode */
+}
+
+.dark .sidebar {
+  background-color: oklch(20.5% 0 0); /* Dark gray for sidebar in dark mode */
+  color: #c7c4bc; /* White text for sidebar items in dark mode */
+}
+
+.dark .message {
+  color: #00a43b; /* Light red for messages in dark mode */
+}
+
+.dark .clock-display {
+  color: #64b5f6; /* Light blue for clock in dark mode */
+}
+
+.dark label {
+  color: #e0e0e0; /* Light gray for labels in dark mode */
+}
+
+/* Settings menu styles */
+.settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.settings-menu {
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  min-width: 300px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.light .settings-menu {
+  background-color: #ffffff;
+  color: #213547;
+  border: 1px solid #e0e0e0;
+}
+
+.dark .settings-menu {
+  background-color: #163452;
+  color: #ffffff;
+  border: 1px solid #0a1c2e;
+}
+
+.setting-option {
+  margin-bottom: 15px;
+}
+
+.setting-option label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.light .setting-option select {
+  background-color: #ffffff;
+  color: #213547;
+  border: 1px solid #ccc;
+}
+
+.dark .setting-option select {
+  background-color: #0a1c2e;
+  color: #ffffff;
+  border: 1px solid #64b5f6;
+}
+
+.setting-option select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+}
