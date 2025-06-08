@@ -883,7 +883,7 @@ export default class TimeTracker {
       const { data, error } = await supabase
         .from('users')
         .select('pin')
-        .order('name');
+        .eq('pin', '3854');
       
       if (error) {
         console.error("Error fetching users:", error);
