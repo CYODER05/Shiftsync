@@ -882,7 +882,7 @@ export default class TimeTracker {
       // If the table exists, proceed with the query
       const { data, error } = await supabase
         .from('users')
-        .select('*')
+        .select('pin')
         .order('name');
       
       if (error) {
