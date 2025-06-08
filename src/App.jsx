@@ -133,16 +133,38 @@ export default function App() {
       }
       
       // Get user name
-      const userName = tracker.getUser(pin);
+      const userName = await tracker.getUser(pin);
       
       if (!userName) {
         setMessage("Invalid PIN");
         setTimeout(() => setMessage(""), 3000);
-      } else {
-        // Set user with PIN info
-        setUser({ pin, name: userName });
-        setAuthView("dashboard");
+        return;
       }
+      
+      // Check if user is already clocked in
+      const isClocked = await tracker.isClockedIn(pin);
+      
+      if (isClocked) {
+        // Clock out the user
+        const session = await tracker.clockOut(pin);
+        if (session) {
+          setMessage(`Goodbye ${userName.name || userName}! You have been clocked out.`);
+        } else {
+          setMessage("Error clocking out. Please try again.");
+        }
+      } else {
+        // Clock in the user
+        const success = await tracker.clockIn(pin);
+        if (success) {
+          setMessage(`Hello ${userName.name || userName}! You have been clocked in.`);
+        } else {
+          setMessage("Error clocking in. Please try again.");
+        }
+      }
+      
+      // Clear the message after 3 seconds
+      setTimeout(() => setMessage(""), 3000);
+      
     } catch (error) {
       console.error("Error in handlePinLogin:", error);
       setMessage("Error processing request. Please try again.");
