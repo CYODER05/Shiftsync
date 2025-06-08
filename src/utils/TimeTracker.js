@@ -108,7 +108,7 @@ export default class TimeTracker {
       console.log("Inserting active session with user_id column");
       const { error } = await supabase
         .from('active_sessions')
-        .insert({ user_id: pin, clock_in: clockIn });
+        .insert({ user_pin: pin, clock_in: clockIn });
       
       if (error) {
         console.error("Error inserting active session:", error);
@@ -147,8 +147,8 @@ export default class TimeTracker {
         const { data, error } = await supabase
           .from('active_sessions')
           .select('clock_in')
-          .eq('user_id', pin)
-          .single();
+          .eq('user_pin', pin)
+  ;
         
         if (error || !data) {
           console.error("Error getting clock in time from database:", error);
@@ -197,7 +197,7 @@ export default class TimeTracker {
       const { error: deleteError } = await supabase
         .from('active_sessions')
         .delete()
-        .eq('user_id', pin);
+        .eq('user_pin', pin);
       
       if (deleteError) {
         console.error("Error removing active session:", deleteError);
@@ -247,7 +247,7 @@ export default class TimeTracker {
       const { data, error } = await supabase
         .from('active_sessions')
         .select('*')
-        .eq('user_id', pin);
+        .eq('user_pin', pin);
       
       if (error) {
         console.error("Error checking if user is clocked in:", error);
@@ -279,7 +279,7 @@ export default class TimeTracker {
         .from('users')
         .select('name')
         .eq('pin', pin)
-        .single();
+;
       
       return data ? data.name : null;
     } catch (error) {
@@ -325,8 +325,8 @@ export default class TimeTracker {
           // Map using user_id instead of user_pin
           this.activeSessions = new Map(
             activeSessions
-              .filter(s => s.user_id) // Only include sessions with user_id
-              .map(s => [s.user_id, s.clock_in])
+              .filter(s => s.user_pin) // Only include sessions with user_pin
+              .map(s => [s.user_pin, s.clock_in])
           );
           console.log(`Loaded ${this.activeSessions.size} active sessions into cache`);
         }
@@ -446,7 +446,7 @@ export default class TimeTracker {
           .from('users')
           .select('name')
           .eq('pin', session.user_pin)
-          .single();
+;
         
         result.push({
           id: session.id,
@@ -570,7 +570,7 @@ export default class TimeTracker {
           .from('users')
           .select('name')
           .eq('pin', userId)
-          .single();
+  ;
         
         result.push({
           name: userData?.name || 'Unknown User',
@@ -592,13 +592,23 @@ export default class TimeTracker {
       if (!pin || !name) return false;
       
       // Check if user already exists
-      const { data: existingUser } = await supabase
+      const { data: existingUsers, error: checkError } = await supabase
         .from('users')
         .select('pin')
         .eq('pin', pin)
         .single();
       
-      if (existingUser) return false;
+      // If there's an error other than no rows found, return false
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking for existing user:', checkError);
+        return false;
+      }
+      
+      // If user already exists, return false
+      if (existingUsers && existingUsers.length > 0) {
+        console.log('User with PIN', pin, 'already exists');
+        return false;
+      }
       
       const rate = hourlyRate || 0;
       const timestamp = new Date().toISOString();
@@ -882,8 +892,8 @@ export default class TimeTracker {
       // If the table exists, proceed with the query
       const { data, error } = await supabase
         .from('users')
-        .select('pin')
-        .eq('pin', '3854');
+        .select('*')
+        .order('name');
       
       if (error) {
         console.error("Error fetching users:", error);
