@@ -1,4 +1,3 @@
-// Test Push
 // src/utils/TimeTracker.js
 import { supabase } from '../supabaseClient';
 import eventBus from './EventBus';
