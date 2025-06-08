@@ -558,10 +558,10 @@ export default class TimeTracker {
       
       for (const session of data) {
         // Get the user ID from the session
-        const userId = session.user_id;
+        const userPin = session.user_pin;
         
-        if (!userId) {
-          console.log("Session missing user_id:", session);
+        if (!userPin) {
+          console.log("Session missing user_pin:", session);
           continue;
         }
         
@@ -569,7 +569,7 @@ export default class TimeTracker {
         const { data: userData } = await supabase
           .from('users')
           .select('name')
-          .eq('pin', userId)
+          .eq('pin', userPin)
   ;
         
         result.push({
