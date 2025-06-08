@@ -37,6 +37,16 @@ export default function App() {
     const checkSession = async () => {
       setIsLoading(true);
       try {
+        // Check URL parameters for direct navigation
+        const urlParams = new URLSearchParams(window.location.search);
+        const viewParam = urlParams.get('view');
+        
+        if (viewParam === 'pin') {
+          setAuthView('pin');
+          setIsLoading(false);
+          return;
+        }
+        
         // Check if user is already signed in with Supabase Auth
         const { data: { session } } = await supabase.auth.getSession();
         

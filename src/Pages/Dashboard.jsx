@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import Clock from '../components/Clock';
+import Display from '../components/Display';
+import Keypad from '../components/Keypad';
 import TimeSheet from '../components/TimeSheet';
 import AdminPanel from './AdminPanel';
 import UserManagement from '../components/UserManagement';
@@ -128,6 +130,10 @@ export default function Dashboard({ user, onLogout }) {
     setCurrentView('timeSheet');
   };
 
+  const kioskBtn = () => {
+    setCurrentView('kiosk');
+  };
+
   const toggleBackgroundColorMode = (mode) => {
     setBackgroundColorMode(mode);
   };
@@ -148,6 +154,12 @@ export default function Dashboard({ user, onLogout }) {
     
     // Call the logout callback
     onLogout();
+  };
+
+  // Function to navigate to PIN login screen
+  const goToPinLogin = () => {
+    // This will navigate back to the PIN login screen
+    window.location.href = window.location.origin + '?view=pin';
   };
 
   if (isLoading) {
@@ -208,6 +220,16 @@ export default function Dashboard({ user, onLogout }) {
                   EMPLOYEES
                 </div>
               )}
+              {isAdmin && (
+                <div
+                  className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center ${
+                    currentView === 'kiosk' ? 'bg-gray-200' : ''
+                  }`}
+                  onClick={kioskBtn}
+                >
+                  KIOSK
+                </div>
+              )}
               <div
                 className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center row-[16] ${
                   isSettingsOpen ? 'bg-gray-200' : ''
@@ -229,6 +251,31 @@ export default function Dashboard({ user, onLogout }) {
               onDeleteSession={handleDeleteSession}
               tracker={tracker}
             />
+          )}
+          {currentView === 'kiosk' && isAdmin && (
+            <div className="w-[80%] ml-auto mr-auto pt-[40px] pb-[40px] block">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold mb-8">Employee Kiosk Access</h2>
+                <p className="text-lg mb-8 text-gray-600">
+                  Use this link to access the employee time tracking keypad
+                </p>
+                <div className="bg-white p-8 rounded-lg shadow-md max-w-md mx-auto">
+                  <h3 className="text-xl font-semibold mb-4">Keypad Access</h3>
+                  <p className="mb-6 text-gray-700">
+                    Click the button below to open the employee keypad for clocking in and out.
+                  </p>
+                  <button
+                    onClick={goToPinLogin}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors"
+                  >
+                    Open Employee Keypad
+                  </button>
+                </div>
+                <div className="mt-8 text-sm text-gray-500">
+                  <p>This will open the PIN entry screen where employees can clock in and out.</p>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
