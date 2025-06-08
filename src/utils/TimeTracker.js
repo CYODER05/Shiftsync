@@ -920,7 +920,7 @@ export default class TimeTracker {
           .from('users')
           .select('current_hourly_rate')
           .eq('pin', pin)
-          
+          .single();
         
         if (error) throw error;
         
