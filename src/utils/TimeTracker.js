@@ -5,7 +5,6 @@ import eventBus from './EventBus';
 export default class TimeTracker {
   constructor() {
     this.validPins = new Map();
-    this.adminPin = "9999";
     this.sessions = [];
     this.activeSessions = new Map();
     this.hourlyRates = new Map(); // Current hourly rates map
@@ -17,64 +16,9 @@ export default class TimeTracker {
 
   async initializeDatabase() {
     try {
-      // Create tables directly using SQL
-      // First, check if users table exists
-      const { count, error: countError } = await supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true });
-      
-      // If we get an error, the table might not exist
-      if (countError) {
-        console.log("Creating tables...");
-        
-        // Create users table
-        await supabase.from('users').insert({
-          pin: "9999",
-          name: "Admin",
-          current_hourly_rate: 0,
-          role: "Admin",
-          is_admin: true
-        });
-        
-        // Add default users
-        const defaultUsers = [
-          { pin: "1234", name: "Alice", current_hourly_rate: 0, role: "" },
-          { pin: "5678", name: "Bob", current_hourly_rate: 0, role: "" },
-          { pin: "2468", name: "Charlie", current_hourly_rate: 0, role: "" }
-        ];
-        
-        for (const user of defaultUsers) {
-          await supabase.from('users').insert(user);
-          
-          // Add initial hourly rate history
-          await supabase.from('hourly_rate_history').insert({
-            user_pin: user.pin,
-            rate: user.current_hourly_rate,
-            effective_from: new Date(0).toISOString()
-          });
-        }
-      } else if (count === 0) {
-        // Tables exist but no users, add default users
-        console.log("Adding default users...");
-        
-        const defaultUsers = [
-          { pin: "1234", name: "Alice", current_hourly_rate: 0, role: "" },
-          { pin: "5678", name: "Bob", current_hourly_rate: 0, role: "" },
-          { pin: "2468", name: "Charlie", current_hourly_rate: 0, role: "" },
-          { pin: "9999", name: "Admin", current_hourly_rate: 0, role: "Admin", is_admin: true }
-        ];
-        
-        for (const user of defaultUsers) {
-          await supabase.from('users').insert(user);
-          
-          // Add initial hourly rate history
-          await supabase.from('hourly_rate_history').insert({
-            user_pin: user.pin,
-            rate: user.current_hourly_rate,
-            effective_from: new Date(0).toISOString()
-          });
-        }
-      }
+      // Database initialization is now handled by the database schema
+      // No need to create default users here
+      console.log("Database initialization complete");
     } catch (error) {
       console.error("Error in initializeDatabase:", error);
     }
@@ -959,7 +903,4 @@ export default class TimeTracker {
     }
   }
 
-  isAdmin(pin) {
-    return pin === this.adminPin;
-  }
 }
