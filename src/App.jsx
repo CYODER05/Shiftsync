@@ -29,7 +29,8 @@ export default function App() {
   
   // Authentication states
   const [user, setUser] = useState(null);
-  const [authView, setAuthView] = useState("landing"); // landing, login, signup, dashboard, pin
+  const [authView, setAuthView] = useState("landing"); // landing, login, signup, dashboard, pin, kiosk
+  const [kioskData, setKioskData] = useState(null);
   
   // Check for existing session on app load
   useEffect(() => {
@@ -39,6 +40,33 @@ export default function App() {
         // Check URL parameters for direct navigation
         const urlParams = new URLSearchParams(window.location.search);
         const viewParam = urlParams.get('view');
+        const kioskParam = urlParams.get('kiosk');
+        
+        // Check for kiosk URL parameter
+        if (kioskParam) {
+          try {
+            // Load kiosk data from database
+            const { data: kiosk, error } = await supabase
+              .from('kiosks')
+              .select('*')
+              .eq('id', kioskParam)
+              .eq('is_active', true)
+              .single();
+            
+            if (error || !kiosk) {
+              console.error('Kiosk not found or inactive:', error);
+              setAuthView('landing');
+            } else {
+              setKioskData(kiosk);
+              setAuthView('kiosk');
+            }
+          } catch (error) {
+            console.error('Error loading kiosk:', error);
+            setAuthView('landing');
+          }
+          setIsLoading(false);
+          return;
+        }
         
         if (viewParam === 'pin') {
           setAuthView('pin');
@@ -121,7 +149,7 @@ export default function App() {
   };
 
   // Handle PIN-based login
-  const handlePinLogin = async (pin) => {
+  const handlePinLogin = async (pin, kioskId = null) => {
     try {
       
       // Get user name
@@ -138,7 +166,7 @@ export default function App() {
       
       if (isClocked) {
         // Clock out the user
-        const session = await tracker.clockOut(pin);
+        const session = await tracker.clockOut(pin, kioskId);
         if (session) {
           setMessage(`${userName.name || userName} has been clocked out.`);
         } else {
@@ -146,7 +174,7 @@ export default function App() {
         }
       } else {
         // Clock in the user
-        const success = await tracker.clockIn(pin);
+        const success = await tracker.clockIn(pin, kioskId);
         if (success) {
           setMessage(`${userName.name || userName} has been clocked in.`);
         } else {
@@ -174,7 +202,8 @@ export default function App() {
   // Handle PIN submission from keypad
   const handleSubmit = async () => {
     const pin = input;
-    await handlePinLogin(pin);
+    const kioskId = kioskData ? kioskData.id : null;
+    await handlePinLogin(pin, kioskId);
     setInput("");
   };
 
@@ -234,6 +263,26 @@ export default function App() {
           >
             ← Back to Home
           </button>
+        </div>
+      )}
+      
+      {authView === "kiosk" && kioskData && (
+        <div className="flex flex-col items-center justify-center space-y-4 min-h-screen bg-gray-50">
+          <div className="text-center mb-4">
+            <h1 className="text-4xl font-bold mb-2">SHIFTSYNC</h1>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">{kioskData.name}</h2>
+            {kioskData.location && (
+              <p className="text-lg text-gray-600 mb-2">{kioskData.location}</p>
+            )}
+            <p className="text-xl text-gray-600">Enter PIN to Continue</p>
+            {kioskData.description && (
+              <p className="text-sm text-gray-500 mt-2">{kioskData.description}</p>
+            )}
+          </div>
+          <Clock />
+          <Display input={input} />
+          <Keypad onKeyPress={handleKeyPress} onSubmit={handleSubmit} />
+          <Message text={message} />
         </div>
       )}
       

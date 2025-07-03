@@ -1,5 +1,5 @@
 // src/components/KioskTable.jsx
-export default function KioskTable({ kiosks, onToggleStatus, onDelete, onOpenKiosk }) {
+export default function KioskTable({ kiosks, onToggleStatus, onDelete }) {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -78,7 +78,10 @@ export default function KioskTable({ kiosks, onToggleStatus, onDelete, onOpenKio
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                   <button
-                    onClick={() => onOpenKiosk(kiosk)}
+                    onClick={() => {
+                      const kioskUrl = `${window.location.origin}/?kiosk=${kiosk.id}`;
+                      window.open(kioskUrl, '_blank');
+                    }}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
                     disabled={!kiosk.is_active}
                   >

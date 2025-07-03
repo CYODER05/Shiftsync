@@ -3,14 +3,12 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import CreateKioskForm from './CreateKioskForm';
 import KioskTable from './KioskTable';
-import KioskInstance from './KioskInstance';
 
 export default function KioskManagement() {
   const [kiosks, setKiosks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [selectedKiosk, setSelectedKiosk] = useState(null);
 
   useEffect(() => {
     initializeKiosksTable();
@@ -122,23 +120,6 @@ export default function KioskManagement() {
     }
   };
 
-  const handleOpenKiosk = (kiosk) => {
-    setSelectedKiosk(kiosk);
-  };
-
-  const handleBackToManagement = () => {
-    setSelectedKiosk(null);
-  };
-
-  // If a kiosk is selected, show the kiosk instance
-  if (selectedKiosk) {
-    return (
-      <KioskInstance 
-        kiosk={selectedKiosk} 
-        onBack={handleBackToManagement}
-      />
-    );
-  }
 
   return (
     <div className="w-full p-8">
@@ -186,7 +167,6 @@ export default function KioskManagement() {
             kiosks={kiosks}
             onToggleStatus={handleToggleKioskStatus}
             onDelete={handleDeleteKiosk}
-            onOpenKiosk={handleOpenKiosk}
           />
         )}
 
