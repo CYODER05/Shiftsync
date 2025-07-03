@@ -8,6 +8,7 @@ import TimeSheet from '../components/TimeSheet';
 import AdminPanel from './AdminPanel';
 import UserManagement from '../components/UserManagement';
 import Settings from '../components/Settings';
+import KioskManagement from '../components/KioskManagement';
 import TimeTracker from '../utils/TimeTracker';
 
 const tracker = new TimeTracker();
@@ -237,31 +238,7 @@ export default function Dashboard({ user, onLogout }) {
               tracker={tracker}
             />
           )}
-          {currentView === 'kiosk' && (
-            <div className="w-[80%] ml-auto mr-auto pt-[40px] pb-[40px] block">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold mb-8">Employee Kiosk Access</h2>
-                <p className="text-lg mb-8 text-gray-600">
-                  Use this link to access the employee time tracking keypad
-                </p>
-                <div className="bg-white p-8 rounded-lg shadow-md max-w-md mx-auto">
-                  <h3 className="text-xl font-semibold mb-4">Keypad Access</h3>
-                  <p className="mb-6 text-gray-700">
-                    Click the button below to open the employee keypad for clocking in and out.
-                  </p>
-                  <button
-                    onClick={goToPinLogin}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors"
-                  >
-                    Open Employee Keypad
-                  </button>
-                </div>
-                <div className="mt-8 text-sm text-gray-500">
-                  <p>This will open the PIN entry screen where employees can clock in and out.</p>
-                </div>
-              </div>
-            </div>
-          )}
+          {currentView === 'kiosk' && <KioskManagement />}
         </div>
       </div>
 
