@@ -148,7 +148,7 @@ export default function App() {
         // Clock in the user
         const success = await tracker.clockIn(pin);
         if (success) {
-          setMessage(`${userName.name || userName}! has been clocked in.`);
+          setMessage(`${userName.name || userName} has been clocked in.`);
         } else {
           setMessage("Error clocking in. Please try again.");
         }
