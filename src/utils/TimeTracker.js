@@ -10,6 +10,7 @@ export default class TimeTracker {
     this.hourlyRates = new Map(); // Current hourly rates map
     this.hourlyRateHistory = new Map(); // History of hourly rate changes
     this.roles = new Map(); // Added roles map
+    this.adminUsers = new Map(); // Cache for admin status
     this.isInitialized = false;
     this.loadData();
   }
@@ -217,6 +218,47 @@ export default class TimeTracker {
     return this.validPins.get(pin);
   }
 
+  async isAdmin(pin) {
+    try {
+      // Check local cache first for performance
+      if (this.adminUsers.has(pin)) {
+        console.log(`Admin status for PIN ${pin} found in cache:`, this.adminUsers.get(pin));
+        return this.adminUsers.get(pin);
+      }
+      
+      console.log(`Checking admin status for PIN ${pin} in database`);
+      
+      // Query database for admin status
+      const { data, error } = await supabase
+        .from('users')
+        .select('role, is_admin')
+        .eq('pin', pin)
+        .single();
+      
+      if (error) {
+        console.error("Error checking admin status:", error);
+        return false;
+      }
+      
+      if (!data) {
+        console.log(`No user found with PIN ${pin}`);
+        return false;
+      }
+      
+      // Check both role and is_admin column
+      const isAdmin = data.role === 'Admin' || data.is_admin === true;
+      console.log(`Admin status for PIN ${pin}:`, isAdmin, `(role: ${data.role}, is_admin: ${data.is_admin})`);
+      
+      // Cache the result for future lookups
+      this.adminUsers.set(pin, isAdmin);
+      
+      return isAdmin;
+    } catch (error) {
+      console.error("Error in isAdmin:", error);
+      return false;
+    }
+  }
+
   async getUserFromDB(pin) {
     try {
       const { data } = await supabase
@@ -252,6 +294,11 @@ export default class TimeTracker {
           this.validPins = new Map(users.map(u => [u.pin, u.name]));
           this.hourlyRates = new Map(users.map(u => [u.pin, u.current_hourly_rate]));
           this.roles = new Map(users.map(u => [u.pin, u.role || ""]));
+          // Load admin status - check both is_admin column and role
+          this.adminUsers = new Map(users.map(u => [
+            u.pin, 
+            u.is_admin === true || u.role === "Admin"
+          ]));
         }
       } catch (userError) {
         console.error("Exception loading users:", userError);
@@ -585,6 +632,8 @@ export default class TimeTracker {
       this.hourlyRates.set(pin, rate);
       this.roles.set(pin, role);
       this.hourlyRateHistory.set(pin, [{ rate, timestamp }]);
+      // Update admin cache
+      this.adminUsers.set(pin, role === "Admin");
       
       // Notify all components that a new user has been added
       eventBus.publish('user-added', { pin });
@@ -613,6 +662,7 @@ export default class TimeTracker {
       this.hourlyRates.delete(pin);
       this.roles.delete(pin);
       this.hourlyRateHistory.delete(pin);
+      this.adminUsers.delete(pin);
       
       // Notify all components that a user has been deleted
       eventBus.publish('user-deleted', { pin });
@@ -771,6 +821,7 @@ export default class TimeTracker {
         this.validPins.delete(oldPin);
         this.hourlyRates.delete(oldPin);
         this.roles.delete(oldPin);
+        this.adminUsers.delete(oldPin);
         
         if (!applyToAllEntries) {
           this.hourlyRateHistory.delete(oldPin);
@@ -790,6 +841,8 @@ export default class TimeTracker {
       this.validPins.set(pin, name);
       this.hourlyRates.set(pin, newHourlyRate);
       this.roles.set(pin, role);
+      // Update admin cache
+      this.adminUsers.set(pin, role === "Admin");
       
       // Update hourly rate history in local cache
       if (oldPin === pin) {
