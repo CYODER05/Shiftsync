@@ -14,7 +14,6 @@ const tracker = new TimeTracker();
 
 export default function Dashboard({ user, onLogout }) {
   const [currentView, setCurrentView] = useState('timeTracking');
-  const [isAdmin, setIsAdmin] = useState(false);
   const [userName, setUserName] = useState('');
   const [userPin, setUserPin] = useState('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -28,33 +27,23 @@ export default function Dashboard({ user, onLogout }) {
       setIsLoading(true);
       try {
         // If user is authenticated with Supabase Auth
-        if (user?.id) {
-          // Check if user is admin from auth metadata
-          const isUserAdmin = user.user_metadata?.role === 'admin';
-          
-          setUserName(user.user_metadata?.name || user.email || 'Admin');
-          setUserPin(''); // Admins don't have PINs
-          setIsAdmin(isUserAdmin);
-        } else if (user?.pin) {
+        if (user?.pin) {
           // For PIN-based login (employees)
           try {
             const userData = await tracker.getUser(user.pin);
             if (userData) {
               setUserName(userData.name || 'Employee');
               setUserPin(user.pin);
-              setIsAdmin(userData.is_admin || false);
             }
           } catch (error) {
             console.error('Error fetching PIN user data:', error);
             setUserName('Employee');
             setUserPin(user.pin);
-            setIsAdmin(false);
           }
         } else {
           // Default case
           setUserName('');
           setUserPin('');
-          setIsAdmin(false);
         }
 
         await loadSessions();
@@ -210,7 +199,6 @@ export default function Dashboard({ user, onLogout }) {
               >
                 TIMESHEET
               </div>
-              {isAdmin && (
                 <div
                   className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center ${
                     currentView === 'users' ? 'bg-gray-200' : ''
@@ -219,8 +207,6 @@ export default function Dashboard({ user, onLogout }) {
                 >
                   EMPLOYEES
                 </div>
-              )}
-              {isAdmin && (
                 <div
                   className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center ${
                     currentView === 'kiosk' ? 'bg-gray-200' : ''
@@ -229,7 +215,6 @@ export default function Dashboard({ user, onLogout }) {
                 >
                   KIOSK
                 </div>
-              )}
               <div
                 className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center row-[16] ${
                   isSettingsOpen ? 'bg-gray-200' : ''
@@ -242,7 +227,7 @@ export default function Dashboard({ user, onLogout }) {
           </div>
           {/* Render content based on currentView */}
           {currentView === 'timeTracking' && <AdminPanel />}
-          {currentView === 'users' && isAdmin && <UserManagement />}
+          {currentView === 'users' && <UserManagement />}
           {currentView === 'timeSheet' && (
             <TimeSheet
               sessions={sessions}
@@ -252,7 +237,7 @@ export default function Dashboard({ user, onLogout }) {
               tracker={tracker}
             />
           )}
-          {currentView === 'kiosk' && isAdmin && (
+          {currentView === 'kiosk' && (
             <div className="w-[80%] ml-auto mr-auto pt-[40px] pb-[40px] block">
               <div className="text-center">
                 <h2 className="text-3xl font-bold mb-8">Employee Kiosk Access</h2>

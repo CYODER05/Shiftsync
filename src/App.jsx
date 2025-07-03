@@ -140,7 +140,7 @@ export default function App() {
         // Clock out the user
         const session = await tracker.clockOut(pin);
         if (session) {
-          setMessage(`Goodbye ${userName.name || userName}! You have been clocked out.`);
+          setMessage(`${userName.name || userName} has been clocked out.`);
         } else {
           setMessage("Error clocking out. Please try again.");
         }
@@ -148,7 +148,7 @@ export default function App() {
         // Clock in the user
         const success = await tracker.clockIn(pin);
         if (success) {
-          setMessage(`Hello ${userName.name || userName}! You have been clocked in.`);
+          setMessage(`${userName.name || userName}! has been clocked in.`);
         } else {
           setMessage("Error clocking in. Please try again.");
         }
