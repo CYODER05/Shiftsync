@@ -20,7 +20,6 @@ const tracker = new TimeTracker();
 export default function App() {
   const [input, setInput] = useState("");
   const [message, setMessage] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
   const [currentView, setCurrentView] = useState("timeTracking"); // State to manage the current view
   const [backgroundColorMode, setBackgroundColorMode] = useState("light"); // Default to light mode
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); // State to manage settings menu visibility
@@ -116,7 +115,6 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    setIsAdmin(false);
     setUser(null);
     setAuthView("landing");
     setCurrentView("timeTracking"); // Reset view on logout
@@ -125,12 +123,6 @@ export default function App() {
   // Handle PIN-based login
   const handlePinLogin = async (pin) => {
     try {
-      // Check if admin
-      if (tracker.isAdmin(pin)) {
-        setIsAdmin(true);
-        setAuthView("dashboard");
-        return;
-      }
       
       // Get user name
       const userName = await tracker.getUser(pin);
