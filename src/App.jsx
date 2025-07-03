@@ -42,7 +42,7 @@ export default function App() {
         const viewParam = urlParams.get('view');
         const kioskParam = urlParams.get('kiosk');
         
-        // Check for kiosk URL parameter
+        // Check for kiosk URL parameter - this takes priority over everything else
         if (kioskParam) {
           try {
             // Load kiosk data from database
@@ -93,9 +93,17 @@ export default function App() {
     
     checkSession();
     
-    // Set up auth state change listener
+    // Set up auth state change listener - but don't override kiosk mode
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        // Don't change auth view if we're in kiosk mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const kioskParam = urlParams.get('kiosk');
+        
+        if (kioskParam) {
+          return; // Stay in kiosk mode regardless of auth changes
+        }
+        
         if (event === "SIGNED_IN" && session?.user) {
           setUser(session.user);
           setAuthView("dashboard");
