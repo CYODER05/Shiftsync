@@ -41,7 +41,7 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
       if (authError) throw authError;
 
       setSuccessMessage(
-        'Admin account created successfully! Please check your email for verification instructions. Once verified, you can sign in to access the admin panel.'
+        'Account created successfully! Please check your email for verification instructions. Once verified, you can sign in to access the admin panel.'
       );
       
       // Call the success callback
@@ -57,7 +57,7 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">SHIFTSYNC</h1>
-        <p className="text-xl text-gray-600">Create Admin Account</p>
+        <p className="text-xl text-gray-600">Create Account</p>
       </div>
 
       <Clock />
