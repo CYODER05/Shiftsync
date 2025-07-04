@@ -10,6 +10,43 @@ export default function KioskManagement() {
   const [error, setError] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
 
+  // Generate a secure 20-character alphanumeric ID
+  const generateKioskId = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 20; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  // Check if a kiosk ID already exists (collision detection)
+  const checkIdExists = async (id) => {
+    try {
+      const { data, error } = await supabase
+        .from('kiosks')
+        .select('id')
+        .eq('id', id)
+        .single();
+      
+      return !error && data; // Returns true if ID exists
+    } catch (error) {
+      return false; // ID doesn't exist
+    }
+  };
+
+  // Generate a unique kiosk ID with collision detection
+  const generateUniqueKioskId = async (maxRetries = 10) => {
+    for (let i = 0; i < maxRetries; i++) {
+      const id = generateKioskId();
+      const exists = await checkIdExists(id);
+      if (!exists) {
+        return id;
+      }
+    }
+    throw new Error('Unable to generate unique kiosk ID after maximum retries');
+  };
+
   useEffect(() => {
     initializeKiosksTable();
     loadKiosks();
@@ -61,9 +98,13 @@ export default function KioskManagement() {
 
   const handleCreateKiosk = async (kioskData) => {
     try {
+      // Generate a unique ID for the kiosk
+      const uniqueId = await generateUniqueKioskId();
+      
       const { data, error } = await supabase
         .from('kiosks')
         .insert([{
+          id: uniqueId,
           name: kioskData.name,
           description: kioskData.description,
           location: kioskData.location,
@@ -78,7 +119,11 @@ export default function KioskManagement() {
       setShowCreateForm(false);
     } catch (error) {
       console.error('Error creating kiosk:', error);
-      setError('Failed to create kiosk. Please try again.');
+      if (error.message.includes('Unable to generate unique kiosk ID')) {
+        setError('Failed to generate unique kiosk ID. Please try again.');
+      } else {
+        setError('Failed to create kiosk. Please try again.');
+      }
     }
   };
 
@@ -145,7 +190,7 @@ export default function KioskManagement() {
                 <p>Please run this SQL in your Supabase SQL editor:</p>
                 <pre className="bg-gray-800 text-white p-2 rounded mt-2 text-xs overflow-x-auto">
 {`CREATE TABLE kiosks (
-  id SERIAL PRIMARY KEY,
+  id VARCHAR(20) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description TEXT,
   location VARCHAR(255),
