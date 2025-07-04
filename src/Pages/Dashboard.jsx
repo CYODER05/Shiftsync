@@ -18,6 +18,7 @@ export default function Dashboard({ user, onLogout }) {
   const [userName, setUserName] = useState('');
   const [userPin, setUserPin] = useState('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [backgroundColorMode, setBackgroundColorMode] = useState('light');
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -161,84 +162,183 @@ export default function Dashboard({ user, onLogout }) {
   }
 
   return (
-    <div className={`app-container ${backgroundColorMode}`}>
-      <div className="w-screen h-[100%] flex flex-col align-center">
-        <div className="dashboard-head sticky top-0 z-10 w-screen flex justify-between items-center pr-[4rem] pt-[1rem] pb-[1rem] bg-[#c7c4bc]">
-          <h1 className="dashboard-title font-bold absolute left-[50%] translate-x-[-50%]">
+    <div className={`app-container ${backgroundColorMode} min-h-screen`}>
+      <div className="flex flex-col h-screen">
+        {/* Header */}
+        <div className="dashboard-head sticky top-0 z-20 w-full flex justify-between items-center px-4 py-3 bg-[#c7c4bc] shadow-md">
+          {/* Mobile menu button */}
+          <button
+            className="md:hidden p-2 rounded-md hover:bg-gray-200"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          
+          <h1 className="dashboard-title font-bold text-lg md:text-xl flex-1 text-center md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
             SHIFTSYNC
           </h1>
-          <div className="ml-auto flex items-center">
+          
+          <div className="flex items-center space-x-2">
             {userName && (
-              <span className="mr-4 text-gray-700">
+              <span className="hidden sm:block text-sm text-gray-700">
                 Welcome, {userName}
               </span>
             )}
             <button
               onClick={handleLogout}
-              className="text-red-600 rounded hover:bg-red-200"
+              className="text-red-600 px-3 py-1 rounded hover:bg-red-200 text-sm"
             >
               Log Out
             </button>
           </div>
         </div>
-        <div className="flex h-[100%]">
-          <div className="w-[10rem] bg-[#c7c4bc] sidebar">
-            <div className="fixed text-center w-[10rem] h-[100%] grid grid-flow-col grid-rows-18">
-              <div
-                className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center ${
-                  currentView === 'timeTracking' ? 'bg-gray-200' : ''
-                }`}
-                onClick={timeTrackingBtn}
-              >
-                TIME TRACKING
-              </div>
-              <div
-                className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center ${
-                  currentView === 'timeSheet' ? 'bg-gray-200' : ''
-                }`}
-                onClick={timeSheetBtn}
-              >
-                TIMESHEET
-              </div>
-                <div
-                  className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center ${
+
+        <div className="flex flex-1 overflow-hidden">
+          {/* Desktop Sidebar */}
+          <div className="hidden md:flex w-40 bg-[#c7c4bc] flex-col">
+            <nav className="flex-1 py-4">
+              <div className="space-y-1">
+                <button
+                  className={`w-full text-left px-4 py-3 text-sm font-medium hover:bg-gray-200 hover:text-black ${
+                    currentView === 'timeTracking' ? 'bg-gray-200' : ''
+                  }`}
+                  onClick={timeTrackingBtn}
+                >
+                  TIME TRACKING
+                </button>
+                <button
+                  className={`w-full text-left px-4 py-3 text-sm font-medium hover:bg-gray-200 hover:text-black ${
+                    currentView === 'timeSheet' ? 'bg-gray-200' : ''
+                  }`}
+                  onClick={timeSheetBtn}
+                >
+                  TIMESHEET
+                </button>
+                <button
+                  className={`w-full text-left px-4 py-3 text-sm font-medium hover:bg-gray-200 hover:text-black ${
                     currentView === 'users' ? 'bg-gray-200' : ''
                   }`}
                   onClick={usersBtn}
                 >
                   EMPLOYEES
-                </div>
-                <div
-                  className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center ${
+                </button>
+                <button
+                  className={`w-full text-left px-4 py-3 text-sm font-medium hover:bg-gray-200 hover:text-black ${
                     currentView === 'kiosk' ? 'bg-gray-200' : ''
                   }`}
                   onClick={kioskBtn}
                 >
                   KIOSK
+                </button>
+              </div>
+              <div className="mt-auto pt-4">
+                <button
+                  className={`w-full text-left px-4 py-3 text-sm font-medium hover:bg-gray-200 hover:text-black ${
+                    isSettingsOpen ? 'bg-gray-200' : ''
+                  }`}
+                  onClick={openSettings}
+                >
+                  SETTINGS
+                </button>
+              </div>
+            </nav>
+          </div>
+
+          {/* Mobile Navigation Overlay */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden fixed inset-0 z-30 bg-black bg-opacity-50" onClick={() => setIsMobileMenuOpen(false)}>
+              <div className="fixed left-0 top-0 h-full w-64 bg-[#c7c4bc] shadow-lg" onClick={(e) => e.stopPropagation()}>
+                <div className="p-4 border-b">
+                  <h2 className="text-lg font-semibold">Navigation</h2>
+                  <button
+                    className="absolute top-4 right-4 p-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-              <div
-                className={`cursor-pointer hover:bg-gray-200 hover:text-black flex items-center justify-center row-[16] ${
-                  isSettingsOpen ? 'bg-gray-200' : ''
-                }`}
-                onClick={openSettings}
-              >
-                SETTINGS
+                <nav className="p-4">
+                  <div className="space-y-2">
+                    <button
+                      className={`w-full text-left px-4 py-3 rounded-md hover:bg-gray-200 hover:text-black ${
+                        currentView === 'timeTracking' ? 'bg-gray-200' : ''
+                      }`}
+                      onClick={() => {
+                        timeTrackingBtn();
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      TIME TRACKING
+                    </button>
+                    <button
+                      className={`w-full text-left px-4 py-3 rounded-md hover:bg-gray-200 hover:text-black ${
+                        currentView === 'timeSheet' ? 'bg-gray-200' : ''
+                      }`}
+                      onClick={() => {
+                        timeSheetBtn();
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      TIMESHEET
+                    </button>
+                    <button
+                      className={`w-full text-left px-4 py-3 rounded-md hover:bg-gray-200 hover:text-black ${
+                        currentView === 'users' ? 'bg-gray-200' : ''
+                      }`}
+                      onClick={() => {
+                        usersBtn();
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      EMPLOYEES
+                    </button>
+                    <button
+                      className={`w-full text-left px-4 py-3 rounded-md hover:bg-gray-200 hover:text-black ${
+                        currentView === 'kiosk' ? 'bg-gray-200' : ''
+                      }`}
+                      onClick={() => {
+                        kioskBtn();
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      KIOSK
+                    </button>
+                    <button
+                      className={`w-full text-left px-4 py-3 rounded-md hover:bg-gray-200 hover:text-black ${
+                        isSettingsOpen ? 'bg-gray-200' : ''
+                      }`}
+                      onClick={() => {
+                        openSettings();
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      SETTINGS
+                    </button>
+                  </div>
+                </nav>
               </div>
             </div>
-          </div>
-          {/* Render content based on currentView */}
-          {currentView === 'timeTracking' && <AdminPanel />}
-          {currentView === 'users' && <UserManagement />}
-          {currentView === 'timeSheet' && (
-            <TimeSheet
-              sessions={sessions}
-              formatDuration={formatDuration}
-              onEditSession={handleEditSession}
-              onDeleteSession={handleDeleteSession}
-              tracker={tracker}
-            />
           )}
-          {currentView === 'kiosk' && <KioskManagement />}
+
+          {/* Main Content */}
+          <div className="flex-1 overflow-auto">
+            {currentView === 'timeTracking' && <AdminPanel />}
+            {currentView === 'users' && <UserManagement />}
+            {currentView === 'timeSheet' && (
+              <TimeSheet
+                sessions={sessions}
+                formatDuration={formatDuration}
+                onEditSession={handleEditSession}
+                onDeleteSession={handleDeleteSession}
+                tracker={tracker}
+              />
+            )}
+            {currentView === 'kiosk' && <KioskManagement />}
+          </div>
         </div>
       </div>
 

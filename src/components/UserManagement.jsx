@@ -281,13 +281,13 @@ export default function UserManagement() {
   };
 
   return (
-    <div className="w-[80%] mx-auto mt-10 space-y-6">
-      <h2 className="text-2xl font-bold">User Management</h2>
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10 space-y-6">
+      <h2 className="text-xl sm:text-2xl font-bold">User Management</h2>
 
       <div className="mb-4">
         <button
           onClick={openAddUserModal}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
         >
           Add Employee
         </button>

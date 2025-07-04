@@ -182,25 +182,25 @@ export default function TimeSheet({ sessions, formatDuration, onEditSession, onD
   };
 
   return (
-    <div className="w-[80%] ml-auto mr-auto pt-[40px] pb-[40px] block">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
       
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Session History</h2>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center">
-            <label htmlFor="userFilter" className="mr-2 font-medium">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
+        <h2 className="text-xl sm:text-2xl font-bold">Session History</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <label htmlFor="userFilter" className="text-sm font-medium">
               Filter by User:
             </label>
             <select
               id="userFilter"
               value={selectedUser}
               onChange={handleUserFilterChange}
-              className="p-2 border rounded text-black"
+              className="p-2 border rounded text-black w-full sm:w-auto"
             >
               <option value="all">All Users</option>
               {uniqueUsers.map(user => (
@@ -210,7 +210,7 @@ export default function TimeSheet({ sessions, formatDuration, onEditSession, onD
               ))}
             </select>
           </div>
-          <div>
+          <div className="w-full sm:w-auto">
             {/* Use the new DateRangePicker component */}
             <DateRangePicker 
               onChange={handleDateRangeChange} 

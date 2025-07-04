@@ -220,24 +220,24 @@ export default function AdminPanel() {
   }, []);
 
   return (
-    <div className="w-[80%] ml-auto mr-auto pt-[40px] pb-[40px] block">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
       {/* Sorting and Date Range */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <label htmlFor="sortBy" className="mr-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+          <label htmlFor="sortBy" className="text-sm font-medium">
             Sort By:
           </label>
           <select
             id="sortBy"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="p-2 border rounded text-black">
+            className="p-2 border rounded text-black w-full sm:w-auto">
             <option value="name">Name</option>
             <option value="time">Time</option>
             <option value="earnings">Earnings</option>
           </select>
         </div>
-        <div>
+        <div className="w-full sm:w-auto">
           {/* Use the new DateRangePicker component */}
           <DateRangePicker 
             onChange={handleDateRangeChange} 
