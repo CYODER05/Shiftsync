@@ -287,7 +287,7 @@ export default function UserManagement() {
       <div className="mb-4">
         <button
           onClick={openAddUserModal}
-          className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
         >
           Add Employee
         </button>
