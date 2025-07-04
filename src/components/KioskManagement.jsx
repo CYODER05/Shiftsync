@@ -167,20 +167,16 @@ export default function KioskManagement() {
 
 
   return (
-    <div className="w-full p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Kiosk Management</h1>
-            <p className="text-gray-600 mt-2">Manage your employee time tracking kiosks</p>
-          </div>
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-          >
-            Create New Kiosk
-          </button>
-        </div>
+    <div className="w-[80%] ml-auto mr-auto pt-[40px] pb-[40px] block">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Kiosk Management</h2>
+        <button
+          onClick={() => setShowCreateForm(true)}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Create New Kiosk
+        </button>
+      </div>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
@@ -221,7 +217,6 @@ export default function KioskManagement() {
             onCancel={() => setShowCreateForm(false)}
           />
         )}
-      </div>
     </div>
   );
 }
