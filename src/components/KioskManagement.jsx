@@ -165,9 +165,8 @@ export default function KioskManagement() {
     }
   };
 
-
   return (
-    <div className="w-full max-w-none lg:max-w-[90%] xl:max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
         <h2 className="text-xl sm:text-2xl font-bold">Kiosk Management</h2>
         <button

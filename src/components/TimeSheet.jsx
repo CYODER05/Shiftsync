@@ -182,7 +182,7 @@ export default function TimeSheet({ sessions, formatDuration, onEditSession, onD
   };
 
   return (
-    <div className="w-full max-w-none lg:max-w-[90%] xl:max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
