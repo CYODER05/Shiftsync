@@ -17,7 +17,6 @@ export default function Dashboard({ user, onLogout }) {
   const [currentView, setCurrentView] = useState('timeTracking');
   const [userName, setUserName] = useState('');
   const [userPin, setUserPin] = useState('');
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [backgroundColorMode, setBackgroundColorMode] = useState('light');
   const [sessions, setSessions] = useState([]);
@@ -129,12 +128,8 @@ export default function Dashboard({ user, onLogout }) {
     setBackgroundColorMode(mode);
   };
 
-  const openSettings = () => {
-    setIsSettingsOpen(true);
-  };
-
-  const closeSettings = () => {
-    setIsSettingsOpen(false);
+  const settingsBtn = () => {
+    setCurrentView('settings');
   };
 
   const handleLogout = async () => {
@@ -236,9 +231,9 @@ export default function Dashboard({ user, onLogout }) {
               <div className="mt-auto pt-4">
                 <button
                   className={`w-full text-left px-4 py-3 text-sm font-medium hover:bg-gray-200 hover:text-black ${
-                    isSettingsOpen ? 'bg-gray-200' : ''
+                    currentView === 'settings' ? 'bg-gray-200' : ''
                   }`}
-                  onClick={openSettings}
+                  onClick={settingsBtn}
                 >
                   SETTINGS
                 </button>
@@ -309,10 +304,10 @@ export default function Dashboard({ user, onLogout }) {
                     </button>
                     <button
                       className={`w-full text-left px-4 py-3 rounded-md hover:bg-gray-200 hover:text-black ${
-                        isSettingsOpen ? 'bg-gray-200' : ''
+                        currentView === 'settings' ? 'bg-gray-200' : ''
                       }`}
                       onClick={() => {
-                        openSettings();
+                        settingsBtn();
                         setIsMobileMenuOpen(false);
                       }}
                     >
@@ -338,29 +333,16 @@ export default function Dashboard({ user, onLogout }) {
               />
             )}
             {currentView === 'kiosk' && <KioskManagement />}
+            {currentView === 'settings' && (
+              <Settings
+                backgroundColorMode={backgroundColorMode}
+                toggleBackgroundColorMode={toggleBackgroundColorMode}
+              />
+            )}
           </div>
         </div>
       </div>
 
-      {/* Settings Menu */}
-      {isSettingsOpen && (
-        <div className="settings-overlay">
-          <Settings
-            backgroundColorMode={backgroundColorMode}
-            toggleBackgroundColorMode={toggleBackgroundColorMode}
-          />
-          <button
-            onClick={closeSettings}
-            className={`mt-4 ${
-              backgroundColorMode === 'dark'
-                ? 'bg-[#0a1c2e] hover:bg-[#163452]'
-                : 'bg-[#f0f0f0] hover:bg-[#e0e0e0]'
-            }`}
-          >
-            Close Settings
-          </button>
-        </div>
-      )}
     </div>
   );
 }
