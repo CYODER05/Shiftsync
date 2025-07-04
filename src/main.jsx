@@ -98,11 +98,10 @@ function AppWrapper() {
 
   if (isInitializing) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="fixed inset-0 w-full h-full bg-gray-900 flex items-center justify-center z-50">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">SHIFTSYNC</h1>
-          <p className="mb-4">Initializing application...</p>
-          <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mx-auto"></div>
+          <h1 className="text-4xl font-bold mb-8 text-white tracking-wider">SHIFTSYNC</h1>
+          <div className="w-12 h-12 border-t-3 border-white border-solid rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     );
@@ -110,24 +109,24 @@ function AppWrapper() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold mb-4">SHIFTSYNC</h1>
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <div className="fixed inset-0 w-full h-full bg-gray-900 flex items-center justify-center z-50">
+        <div className="text-center max-w-md p-6 bg-gray-800 rounded-lg shadow-lg">
+          <h1 className="text-4xl font-bold mb-4 text-white tracking-wider">SHIFTSYNC</h1>
+          <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded mb-4">
             {error}
           </div>
-          <p className="mb-4">Please check your connection to Supabase and try again.</p>
+          <p className="mb-4 text-gray-300">Please check your connection to Supabase and try again.</p>
           <div className="space-y-2">
             <button 
               onClick={() => setInitializationAttempts(0)}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Retry
             </button>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-400 mt-2">
               Make sure your Supabase project is properly set up and the URL and key are correct.
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-400">
               You may need to create the tables manually in the Supabase dashboard.
             </p>
           </div>
@@ -139,8 +138,19 @@ function AppWrapper() {
   return <App />;
 }
 
+// Hide the initial loading screen once React loads
+const hideInitialLoader = () => {
+  const loader = document.getElementById('initial-loader');
+  if (loader) {
+    loader.style.display = 'none';
+  }
+};
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AppWrapper />
   </React.StrictMode>
 );
+
+// Hide the initial loader after React has mounted
+setTimeout(hideInitialLoader, 100);
