@@ -217,11 +217,10 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center w-screen h-screen bg-gray-100">
+      <div className="fixed inset-0 w-full h-full bg-gray-900 flex items-center justify-center z-50">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">SHIFTSYNC</h1>
-          <p className="mb-4">Loading application...</p>
-          <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mx-auto"></div>
+          <h1 className="text-4xl font-bold mb-8 text-white tracking-wider">SHIFTSYNC</h1>
+          <div className="w-12 h-12 border-t-3 border-white border-solid rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     );
