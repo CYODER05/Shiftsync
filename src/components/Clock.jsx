@@ -1,29 +1,57 @@
 // src/components/Clock.jsx
 import { useEffect, useState } from "react";
 
-export default function Clock() {
+export default function Clock({ timeFormat = '12h', timezone = 'auto', dateFormat = 'MM/DD/YYYY' }) {
   const [now, setNow] = useState(new Date());
-
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-  let d = new Date();
-    let dayOfWeek = d.getDay();
-    let month = d.getMonth();
-    let day = d.getDate();
-    let hours = d.getHours();
-    let minutes = d.getMinutes();
-    let seconds = d.getSeconds();
-
-    seconds = seconds < 10 ? `0${seconds}` : seconds;
-    minutes = minutes < 10 ? `0${minutes}` : minutes;
-    let ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours > 12 ? hours - 12 : hours;
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  return <div className="w-screen flex justify-center pt-[1rem]"><div className="clock-display text-5xl/18 font-mono pb-[20px] text-center size-fit">{days[dayOfWeek]}, {months[month]} {day}<hr></hr>{hours}:{minutes}:{seconds} {ampm}</div></div>;
+  // Format time based on user preferences
+  const formatTime = (date) => {
+    const tz = timezone === 'auto' ? undefined : timezone;
+    
+    const timeOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: timeFormat === '12h',
+      timeZone: tz
+    };
+
+    const dateOptions = {
+      timeZone: tz
+    };
+
+    let formattedDate;
+    if (dateFormat === 'MM/DD/YYYY') {
+      formattedDate = date.toLocaleDateString('en-US', { ...dateOptions, month: 'short', day: 'numeric' });
+    } else if (dateFormat === 'DD/MM/YYYY') {
+      formattedDate = date.toLocaleDateString('en-GB', { ...dateOptions, day: 'numeric', month: 'short' });
+    } else {
+      formattedDate = date.toLocaleDateString('sv-SE', { ...dateOptions, month: 'short', day: 'numeric' });
+    }
+
+    const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
+    const dayName = date.toLocaleDateString('en-US', { ...dateOptions, weekday: 'long' });
+
+    return {
+      dayDate: `${dayName}, ${formattedDate}`,
+      time: formattedTime
+    };
+  };
+
+  const { dayDate, time } = formatTime(now);
+
+  return (
+    <div className="w-screen flex justify-center pt-[1rem]">
+      <div className="clock-display text-5xl/18 font-mono pb-[20px] text-center size-fit">
+        {dayDate}
+        <hr />
+        {time}
+      </div>
+    </div>
+  );
 }

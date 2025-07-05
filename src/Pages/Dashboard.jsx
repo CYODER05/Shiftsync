@@ -19,6 +19,9 @@ export default function Dashboard({ user, onLogout }) {
   const [userPin, setUserPin] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [backgroundColorMode, setBackgroundColorMode] = useState('light');
+  const [timeFormat, setTimeFormat] = useState('12h');
+  const [selectedTimezone, setSelectedTimezone] = useState('auto');
+  const [dateFormat, setDateFormat] = useState('MM/DD/YYYY');
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dbError, setDbError] = useState(null);
@@ -27,6 +30,25 @@ export default function Dashboard({ user, onLogout }) {
     const loadUserData = async () => {
       setIsLoading(true);
       try {
+        // Load user preferences from Supabase if authenticated
+        if (user?.id) {
+          try {
+            const { data: preferences, error } = await supabase
+              .from('user_preferences')
+              .select('*')
+              .eq('user_id', user.id)
+              .single();
+            
+            if (!error && preferences) {
+              if (preferences.time_format) setTimeFormat(preferences.time_format);
+              if (preferences.timezone) setSelectedTimezone(preferences.timezone);
+              if (preferences.date_format) setDateFormat(preferences.date_format);
+            }
+          } catch (error) {
+            console.error('Error loading user preferences:', error);
+          }
+        }
+
         // If user is authenticated with Supabase Auth
         if (user?.pin) {
           // For PIN-based login (employees)
@@ -126,6 +148,55 @@ export default function Dashboard({ user, onLogout }) {
 
   const toggleBackgroundColorMode = (mode) => {
     setBackgroundColorMode(mode);
+  };
+
+  // Time settings handlers
+  const handleTimeFormatChange = async (format) => {
+    setTimeFormat(format);
+    if (user?.id) {
+      try {
+        await supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: user.id,
+            time_format: format
+          });
+      } catch (error) {
+        console.error('Error saving time format:', error);
+      }
+    }
+  };
+
+  const handleTimezoneChange = async (timezone) => {
+    setSelectedTimezone(timezone);
+    if (user?.id) {
+      try {
+        await supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: user.id,
+            timezone: timezone
+          });
+      } catch (error) {
+        console.error('Error saving timezone:', error);
+      }
+    }
+  };
+
+  const handleDateFormatChange = async (format) => {
+    setDateFormat(format);
+    if (user?.id) {
+      try {
+        await supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: user.id,
+            date_format: format
+          });
+      } catch (error) {
+        console.error('Error saving date format:', error);
+      }
+    }
   };
 
   const settingsBtn = () => {
@@ -321,7 +392,13 @@ export default function Dashboard({ user, onLogout }) {
 
           {/* Main Content */}
           <div className="flex-1 overflow-auto">
-            {currentView === 'timeTracking' && <AdminPanel />}
+            {currentView === 'timeTracking' && (
+              <AdminPanel 
+                timeFormat={timeFormat}
+                selectedTimezone={selectedTimezone}
+                dateFormat={dateFormat}
+              />
+            )}
             {currentView === 'users' && <UserManagement />}
             {currentView === 'timeSheet' && (
               <TimeSheet
@@ -330,6 +407,9 @@ export default function Dashboard({ user, onLogout }) {
                 onEditSession={handleEditSession}
                 onDeleteSession={handleDeleteSession}
                 tracker={tracker}
+                timeFormat={timeFormat}
+                selectedTimezone={selectedTimezone}
+                dateFormat={dateFormat}
               />
             )}
             {currentView === 'kiosk' && <KioskManagement />}
@@ -337,6 +417,12 @@ export default function Dashboard({ user, onLogout }) {
               <Settings
                 backgroundColorMode={backgroundColorMode}
                 toggleBackgroundColorMode={toggleBackgroundColorMode}
+                timeFormat={timeFormat}
+                selectedTimezone={selectedTimezone}
+                dateFormat={dateFormat}
+                onTimeFormatChange={handleTimeFormatChange}
+                onTimezoneChange={handleTimezoneChange}
+                onDateFormatChange={handleDateFormatChange}
               />
             )}
           </div>
