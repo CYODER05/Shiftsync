@@ -42,7 +42,10 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
         // Handle specific Supabase auth errors for duplicate email
         if (authError.message.includes('User already registered') || 
             authError.message.includes('already been registered') ||
-            authError.message.includes('email address is already registered')) {
+            authError.message.includes('email address is already registered') ||
+            authError.message.includes('already exists') ||
+            authError.message.includes('duplicate') ||
+            authError.code === 'user_already_exists') {
           setError('This email is already associated with an account. Please use a different email or try signing in.');
         } else {
           setError(authError.message || 'An error occurred during signup');

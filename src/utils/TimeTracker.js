@@ -535,6 +535,14 @@ export default class TimeTracker {
     try {
       if (!pin || !name) return false;
       
+      // Get the current authenticated user
+      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !currentUser) {
+        console.error('Error getting current user or user not authenticated:', authError);
+        return false;
+      }
+      
       // Check if user already exists
       const { data: existingUsers, error: checkError } = await supabase
         .from('users')
@@ -557,14 +565,15 @@ export default class TimeTracker {
       const rate = hourlyRate || 0;
       const timestamp = new Date().toISOString();
       
-      // Add user to database
+      // Add user to database with owner_id set to current authenticated user
       const { error: userError } = await supabase
         .from('users')
         .insert({
           pin,
           name,
           current_hourly_rate: rate,
-          role
+          role,
+          owner_id: currentUser.id
         });
       
       if (userError) throw userError;
@@ -684,13 +693,22 @@ export default class TimeTracker {
           }
         }
         
+        // Get the current authenticated user to preserve owner_id
+        const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !currentUser) {
+          console.error('Error getting current user or user not authenticated:', authError);
+          return false;
+        }
+        
         // Update the user record
         const { error: updateError } = await supabase
           .from('users')
           .update({
             name,
             current_hourly_rate: newHourlyRate,
-            role
+            role,
+            owner_id: currentUser.id
           })
           .eq('pin', pin);
         
@@ -735,6 +753,14 @@ export default class TimeTracker {
         } else {
           // If not applying to all entries, create a new user with the new PIN
           
+          // Get the current authenticated user
+          const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+          
+          if (authError || !currentUser) {
+            console.error('Error getting current user or user not authenticated:', authError);
+            return false;
+          }
+          
           // Add the new user
           const { error: insertError } = await supabase
             .from('users')
@@ -742,7 +768,8 @@ export default class TimeTracker {
               pin,
               name,
               current_hourly_rate: newHourlyRate,
-              role
+              role,
+              owner_id: currentUser.id
             });
           
           if (insertError) throw insertError;
