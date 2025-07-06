@@ -79,8 +79,8 @@ button:focus-visible {
 }
 
 .dark {
-  background-color: oklch(37.1% 0 0);
-  color: rgba(255, 255, 255, 0.87);
+  background-color: #0f172a; /* Modern dark slate background */
+  color: #e2e8f0; /* Light slate text */
 }
 
 /* Element-specific text colors for light mode */
@@ -89,16 +89,16 @@ button:focus-visible {
 }
 
 .light .dashboard-head {
-  background-color:rgb(255, 255, 255);
-  color: #262624; /* White text for dashboard head regardless of mode */
+  background-color: rgb(255, 255, 255);
+  color: #262624;
 }
 
 .light .dash-table-bg {
-  background-color:rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255);
 }
 
 .light .session-history-bg {
-  background-color:rgb(255, 255, 255); /* Light gray for session history in light mode */
+  background-color: rgb(255, 255, 255);
 }
 
 .light .active-icon-bg {
@@ -106,7 +106,7 @@ button:focus-visible {
 }
 
 .light .sidebar {
-  background-color:rgb(255, 255, 255); /* Light gray for sidebar in light mode */
+  background-color: rgb(255, 255, 255);
   color: #262624; 
 }
 
@@ -115,57 +115,161 @@ button:focus-visible {
 }
 
 .light .clock-display {
-  color: #262624; /* Dark blue for clock in light mode */
+  color: #262624;
 }
 
 .light label {
-  color: #262624; /* Dark gray for labels in light mode */
+  color: #262624;
 }
 
 /* Element-specific text colors for dark mode */
+.dark h1, .dark h2, .dark h3 {
+  color: #f1f5f9; /* Bright white for headings */
+}
 
 .dark .dashboard-head {
-  background-color: oklch(20.5% 0 0);
-  color: #c7c4bc; /* White text for dashboard head regardless of mode */
+  background-color: #1e293b; /* Dark slate for header */
+  color: #f1f5f9;
+  border-bottom: 1px solid #334155;
 }
 
 .dark .dash-table-bg {
-  background-color: oklch(20.5% 0 0);
-  border: 1px solid 
+  background-color: #1e293b; /* Dark slate for tables */
+  border: 1px solid #334155;
 }
 
 .dark .session-history-bg {
-  background-color: #262624; /* Dark gray for session history in dark mode */
-  color:rgb(255, 255, 255); /* White text for session history in dark mode */
+  background-color: #1e293b; /* Dark slate for session history */
+  color: #e2e8f0;
+  border: 1px solid #334155;
 }
 
 .dark .active-icon-bg {
-  background-color: #262624;
+  background-color: #10b981; /* Emerald green for active indicators */
 }
 
 .dark input {
-  color: #c7c4bc; /* White text for inputs in dark mode */
+  background-color: #334155; /* Slate background for inputs */
+  color: #f1f5f9;
+  border: 1px solid #475569;
+}
+
+.dark input:focus {
+  border-color: #3b82f6; /* Blue focus border */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .dark select {
-  color: #c7c4bc; /* White text for select elements in dark mode */
+  background-color: #334155; /* Slate background for selects */
+  color: #f1f5f9;
+  border: 1px solid #475569;
+}
+
+.dark select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .dark .sidebar {
-  background-color: oklch(20.5% 0 0); /* Dark gray for sidebar in dark mode */
-  color: #c7c4bc; /* White text for sidebar items in dark mode */
+  background-color: #1e293b; /* Dark slate for sidebar */
+  color: #e2e8f0;
+  border-right: 1px solid #334155;
 }
 
 .dark .message {
-  color: #00a43b; /* Light red for messages in dark mode */
+  color: #10b981; /* Emerald green for success messages */
 }
 
 .dark .clock-display {
-  color: #64b5f6; /* Light blue for clock in dark mode */
+  color: #60a5fa; /* Light blue for clock */
 }
 
 .dark label {
-  color: #e0e0e0; /* Light gray for labels in dark mode */
+  color: #cbd5e1; /* Light slate for labels */
+}
+
+/* Button styles for dark mode */
+.dark button {
+  background-color: #3b82f6; /* Blue buttons */
+  color: #ffffff;
+  border: 1px solid #3b82f6;
+}
+
+.dark button:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.dark button:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Secondary button styles */
+.dark .btn-secondary {
+  background-color: #475569;
+  color: #e2e8f0;
+  border: 1px solid #64748b;
+}
+
+.dark .btn-secondary:hover {
+  background-color: #64748b;
+  border-color: #64748b;
+}
+
+/* Danger button styles */
+.dark .btn-danger {
+  background-color: #dc2626;
+  color: #ffffff;
+  border: 1px solid #dc2626;
+}
+
+.dark .btn-danger:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+/* Success button styles */
+.dark .btn-success {
+  background-color: #10b981;
+  color: #ffffff;
+  border: 1px solid #10b981;
+}
+
+.dark .btn-success:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+/* Table row hover effects */
+.dark tr:hover {
+  background-color: #334155;
+}
+
+/* Card/panel backgrounds */
+.dark .card, .dark .panel {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+}
+
+/* Text color variations */
+.dark .text-muted {
+  color: #94a3b8;
+}
+
+.dark .text-primary {
+  color: #60a5fa;
+}
+
+.dark .text-success {
+  color: #34d399;
+}
+
+.dark .text-warning {
+  color: #fbbf24;
+}
+
+.dark .text-danger {
+  color: #f87171;
 }
 
 /* Settings menu styles */
@@ -197,9 +301,9 @@ button:focus-visible {
 }
 
 .dark .settings-menu {
-  background-color: #163452;
-  color: #ffffff;
-  border: 1px solid #0a1c2e;
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid #334155;
 }
 
 .setting-option {
@@ -219,9 +323,14 @@ button:focus-visible {
 }
 
 .dark .setting-option select {
-  background-color: #0a1c2e;
-  color: #ffffff;
-  border: 1px solid #64b5f6;
+  background-color: #334155;
+  color: #f1f5f9;
+  border: 1px solid #475569;
+}
+
+.dark .setting-option select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .setting-option select {

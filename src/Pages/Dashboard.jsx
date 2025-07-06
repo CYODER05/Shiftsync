@@ -246,7 +246,7 @@ export default function Dashboard({ user, onLogout }) {
     <div className={`app-container ${backgroundColorMode} min-h-screen`}>
       <div className="flex flex-col h-screen">
         {/* Header */}
-        <div className="dashboard-head sticky top-0 z-20 w-full flex justify-between items-center px-4 py-3 bg-[#c7c4bc] shadow-md">
+        <div className="dashboard-head sticky top-0 z-20 w-full flex justify-between items-center px-4 py-3 shadow-md">
           {/* Mobile menu button */}
           <button
             className="md:hidden p-2 rounded-md hover:bg-gray-200"
@@ -278,7 +278,7 @@ export default function Dashboard({ user, onLogout }) {
 
         <div className="flex flex-1 overflow-hidden">
           {/* Desktop Sidebar */}
-          <div className="hidden md:flex w-40 bg-[#c7c4bc] flex-col">
+          <div className="hidden md:flex w-40 sidebar flex-col">
             <nav className="flex-1 py-4">
               <div className="space-y-1">
                 <button
@@ -330,7 +330,7 @@ export default function Dashboard({ user, onLogout }) {
           {/* Mobile Navigation Overlay */}
           {isMobileMenuOpen && (
             <div className="md:hidden fixed inset-0 z-30 bg-black bg-opacity-50" onClick={() => setIsMobileMenuOpen(false)}>
-              <div className="fixed left-0 top-0 h-full w-64 bg-[#c7c4bc] shadow-lg" onClick={(e) => e.stopPropagation()}>
+              <div className="fixed left-0 top-0 h-full w-64 sidebar shadow-lg" onClick={(e) => e.stopPropagation()}>
                 <div className="p-4 border-b">
                   <h2 className="text-lg font-semibold">Navigation</h2>
                   <button

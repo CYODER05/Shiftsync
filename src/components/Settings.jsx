@@ -78,20 +78,20 @@ export default function Settings({
       </div>
 
       <div className="max-w-2xl">
-        <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 space-y-6 border dark:border-slate-600">
           <div className="setting-option">
             <label className="block text-sm font-medium mb-2">
               Background Color Mode:
             </label>
             <select
-              className="w-full sm:w-auto p-3 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full sm:w-auto p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={backgroundColorMode}
               onChange={(e) => toggleBackgroundColorMode(e.target.value)}
             >
               <option value="light">Light Mode</option>
               <option value="dark">Dark Mode</option>
             </select>
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-sm text-muted mt-2">
               Choose between light and dark theme for the application interface.
             </p>
           </div>
@@ -105,7 +105,7 @@ export default function Settings({
                   Time Format:
                 </label>
                 <select
-                  className="w-full sm:w-auto p-3 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full sm:w-auto p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={timeFormat}
                   onChange={(e) => onTimeFormatChange(e.target.value)}
                 >
@@ -115,7 +115,7 @@ export default function Settings({
                     </option>
                   ))}
                 </select>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-muted mt-2">
                   Choose between 12-hour and 24-hour time display format.
                 </p>
               </div>
@@ -125,7 +125,7 @@ export default function Settings({
                   Timezone:
                 </label>
                 <select
-                  className="w-full sm:w-auto p-3 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full sm:w-auto p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={selectedTimezone}
                   onChange={(e) => onTimezoneChange(e.target.value)}
                 >
@@ -135,7 +135,7 @@ export default function Settings({
                     </option>
                   ))}
                 </select>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-muted mt-2">
                   Select your timezone for accurate time tracking and display.
                 </p>
               </div>
@@ -145,7 +145,7 @@ export default function Settings({
                   Date Format:
                 </label>
                 <select
-                  className="w-full sm:w-auto p-3 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full sm:w-auto p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={dateFormat}
                   onChange={(e) => onDateFormatChange(e.target.value)}
                 >
@@ -155,17 +155,17 @@ export default function Settings({
                     </option>
                   ))}
                 </select>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-muted mt-2">
                   Choose your preferred date display format.
                 </p>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Preview:</h4>
-                <p className="text-lg font-mono text-gray-900">
+              <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg border dark:border-slate-600">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Preview:</h4>
+                <p className="text-lg font-mono text-gray-900 dark:text-slate-100">
                   {formatTimePreview(currentTime)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                   Live preview of your current time and date settings
                 </p>
               </div>
@@ -199,7 +199,7 @@ export default function Settings({
               >
                 Refresh Application
               </button>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted">
                 Reload the application to refresh all data and clear any temporary issues.
               </p>
             </div>
