@@ -42,23 +42,46 @@ export default function App() {
     const loadGlobalTimeSettings = async () => {
       try {
         console.log('Loading global time settings...');
-        // Try to find any user preferences to use as global settings
+        
+        // Get ALL user preferences to see what's in the database
+        const { data: allPreferences, error: allError } = await supabase
+          .from('user_preferences')
+          .select('*');
+        
+        console.log('ALL preferences in database:', allPreferences);
+        console.log('Query error (if any):', allError);
+        
+        // Try to find any user preferences (most recent first)
         const { data: preferences, error: prefError } = await supabase
           .from('user_preferences')
           .select('*')
+          .order('created_at', { ascending: false })
           .limit(1);
         
-        console.log('Preferences data:', preferences);
+        console.log('Latest preferences data:', preferences);
+        console.log('Preferences query error (if any):', prefError);
         
         if (!prefError && preferences && preferences.length > 0) {
           const pref = preferences[0];
-          console.log('Setting global time format to:', pref.time_format);
-          console.log('Setting global timezone to:', pref.timezone);
-          console.log('Setting global date format to:', pref.date_format);
+          console.log('Found preferences! Details:');
+          console.log('- user_id:', pref.user_id);
+          console.log('- time_format:', pref.time_format);
+          console.log('- timezone:', pref.timezone);
+          console.log('- date_format:', pref.date_format);
+          console.log('- created_at:', pref.created_at);
           
-          if (pref.time_format) setGlobalTimeFormat(pref.time_format);
-          if (pref.timezone) setGlobalTimezone(pref.timezone);
-          if (pref.date_format) setGlobalDateFormat(pref.date_format);
+          if (pref.time_format) {
+            console.log('Setting global time format to:', pref.time_format);
+            setGlobalTimeFormat(pref.time_format);
+          }
+          if (pref.timezone) {
+            console.log('Setting global timezone to:', pref.timezone);
+            setGlobalTimezone(pref.timezone);
+          }
+          if (pref.date_format) {
+            console.log('Setting global date format to:', pref.date_format);
+            setGlobalDateFormat(pref.date_format);
+          }
         } else {
           console.log('No preferences found, using defaults');
         }
@@ -87,8 +110,8 @@ export default function App() {
       )
       .subscribe();
 
-    // Also refresh settings every 30 seconds as a fallback
-    const interval = setInterval(loadGlobalTimeSettings, 30000);
+    // Also refresh settings every 5 seconds as a fallback
+    const interval = setInterval(loadGlobalTimeSettings, 5000);
 
     // Cleanup
     return () => {
