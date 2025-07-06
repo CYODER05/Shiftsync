@@ -98,6 +98,14 @@ export default function KioskManagement() {
 
   const handleCreateKiosk = async (kioskData) => {
     try {
+      // Get the current authenticated user
+      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !currentUser) {
+        setError('You must be logged in to create a kiosk.');
+        return;
+      }
+
       // Generate a unique ID for the kiosk
       const uniqueId = await generateUniqueKioskId();
       
@@ -109,6 +117,7 @@ export default function KioskManagement() {
           description: kioskData.description,
           location: kioskData.location,
           is_active: true,
+          owner_id: currentUser.id,
           created_at: new Date().toISOString()
         }])
         .select();
@@ -190,6 +199,7 @@ export default function KioskManagement() {
   description TEXT,
   location VARCHAR(255),
   is_active BOOLEAN DEFAULT true,
+  owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );`}
                 </pre>
