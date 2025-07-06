@@ -161,11 +161,11 @@ export default function Settings({
               </div>
 
               <div className="bg-white preview p-4 rounded-lg border dark:border-slate-600">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Preview:</h4>
-                <p className="text-lg font-mono text-gray-900">
+                <h4 className="text-sm font-medium text-gray-700 preview mb-2">Preview:</h4>
+                <p className="text-lg font-mono text-gray-900 time-preview">
                   {formatTimePreview(currentTime)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-gray-500 preview-desc mt-1">
                   Live preview of your current time and date settings
                 </p>
               </div>

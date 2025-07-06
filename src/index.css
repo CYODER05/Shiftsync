@@ -306,6 +306,18 @@ button:focus-visible {
   border: 1px solid #334155;
 }
 
+.dark .preview {
+  color: oklch(86.9% 0.022 252.894);
+}
+
+.dark .time-preview {
+  color: oklch(96.8% 0.007 247.896)
+}
+
+.dark .preview-desc {
+  color: oklch(70.4% 0.04 256.788);
+}
+
 .setting-option {
   margin-bottom: 15px;
 }
