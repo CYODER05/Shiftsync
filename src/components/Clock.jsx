@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export default function Clock({ timeFormat = '12h', timezone = 'auto', dateFormat = 'MM/DD/YYYY' }) {
   const [now, setNow] = useState(new Date());
+  const [formattedDisplay, setFormattedDisplay] = useState({ dayDate: '', time: '' });
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -43,14 +44,18 @@ export default function Clock({ timeFormat = '12h', timezone = 'auto', dateForma
     };
   };
 
-  const { dayDate, time } = formatTime(now);
+  // Update formatted display when time or format settings change
+  useEffect(() => {
+    console.log('Clock component props changed:', { timeFormat, timezone, dateFormat });
+    setFormattedDisplay(formatTime(now));
+  }, [now, timeFormat, timezone, dateFormat]);
 
   return (
     <div className="w-screen flex justify-center pt-[1rem]">
       <div className="clock-display text-5xl/18 font-mono pb-[20px] text-center size-fit">
-        {dayDate}
+        {formattedDisplay.dayDate}
         <hr />
-        {time}
+        {formattedDisplay.time}
       </div>
     </div>
   );

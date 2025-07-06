@@ -41,17 +41,26 @@ export default function App() {
   useEffect(() => {
     const loadGlobalTimeSettings = async () => {
       try {
+        console.log('Loading global time settings...');
         // Try to find any user preferences to use as global settings
         const { data: preferences, error: prefError } = await supabase
           .from('user_preferences')
           .select('*')
           .limit(1);
         
+        console.log('Preferences data:', preferences);
+        
         if (!prefError && preferences && preferences.length > 0) {
           const pref = preferences[0];
+          console.log('Setting global time format to:', pref.time_format);
+          console.log('Setting global timezone to:', pref.timezone);
+          console.log('Setting global date format to:', pref.date_format);
+          
           if (pref.time_format) setGlobalTimeFormat(pref.time_format);
           if (pref.timezone) setGlobalTimezone(pref.timezone);
           if (pref.date_format) setGlobalDateFormat(pref.date_format);
+        } else {
+          console.log('No preferences found, using defaults');
         }
       } catch (error) {
         console.error('Error loading global time settings:', error);
