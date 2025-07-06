@@ -306,7 +306,7 @@ button:focus-visible {
   border: 1px solid #334155;
 }
 
-.dark .preview {
+.dark .preview-text {
   color: oklch(86.9% 0.022 252.894);
 }
 
