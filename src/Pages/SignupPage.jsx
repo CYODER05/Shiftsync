@@ -60,8 +60,6 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
         <p className="text-xl text-gray-600">Create Account</p>
       </div>
 
-      <Clock />
-
       <div className="mt-8 w-full max-w-md bg-white p-8 rounded-lg shadow-md">
         {successMessage ? (
           <div className="text-center">
@@ -79,7 +77,7 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="mb-4 p-4 bg-blue-50 border-l-4 border-blue-500">
               <p className="text-blue-700 text-sm">
-                <strong>Creating an Admin Account:</strong> This will give you access to the admin panel where you can add and manage employees. You won't appear as an employee in the system.
+                <strong>Creating an Admin Account:</strong> 
               </p>
             </div>
 
