@@ -26,7 +26,7 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
     }
 
     try {
-      // Sign up with Supabase Auth only - no database records needed
+      // Sign up with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -38,7 +38,18 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
         },
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        // Handle specific Supabase auth errors for duplicate email
+        if (authError.message.includes('User already registered') || 
+            authError.message.includes('already been registered') ||
+            authError.message.includes('email address is already registered')) {
+          setError('This email is already associated with an account. Please use a different email or try signing in.');
+        } else {
+          setError(authError.message || 'An error occurred during signup');
+        }
+        setLoading(false);
+        return;
+      }
 
       setSuccessMessage(
         'Account created successfully! Please check your email for verification instructions. Once verified, you can sign in to access the admin panel.'
@@ -47,7 +58,14 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
       // Call the success callback
       onSignupSuccess(authData.user);
     } catch (error) {
-      setError(error.message || 'An error occurred during signup');
+      // Handle any unexpected errors
+      if (error.message && (error.message.includes('already registered') || 
+                           error.message.includes('already been registered') ||
+                           error.message.includes('email address is already registered'))) {
+        setError('This email is already associated with an account. Please use a different email or try signing in.');
+      } else {
+        setError(error.message || 'An error occurred during signup');
+      }
     } finally {
       setLoading(false);
     }
