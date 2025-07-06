@@ -223,7 +223,7 @@ export default class TimeTracker {
         .from('users')
         .select('name')
         .eq('pin', pin)
-;
+        .single();
       
       return data ? data.name : null;
     } catch (error) {
@@ -390,7 +390,7 @@ export default class TimeTracker {
           .from('users')
           .select('name')
           .eq('pin', session.user_pin)
-;
+          .single();
         
         result.push({
           id: session.id,
@@ -514,7 +514,7 @@ export default class TimeTracker {
           .from('users')
           .select('name')
           .eq('pin', userPin)
-  ;
+          .single();
         
         result.push({
           name: userData?.name || 'Unknown User',
