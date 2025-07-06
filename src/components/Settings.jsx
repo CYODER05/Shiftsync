@@ -78,7 +78,7 @@ export default function Settings({
       </div>
 
       <div className="max-w-2xl">
-        <div className=".dash-table-bg rounded-lg shadow-md p-6 space-y-6 border dark:border-slate-600">
+        <div className="settings-menu rounded-lg shadow-md p-6 space-y-6 border dark:border-slate-600">
           <div className="setting-option">
             <label className="block text-sm font-medium mb-2">
               Background Color Mode:
