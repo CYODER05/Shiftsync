@@ -4,7 +4,7 @@ import DateRangePicker from "./DateRangePicker";
 import { supabase } from "../supabaseClient";
 import eventBus from "../utils/EventBus";
 
-export default function TimeSheet({ sessions, formatDuration, onEditSession, onDeleteSession, tracker }) {
+export default function TimeSheet({ sessions, formatDuration, onEditSession, onDeleteSession, tracker, timeFormat = '12h', selectedTimezone = 'auto', dateFormat = 'MM/DD/YYYY' }) {
   // Helper function to calculate earnings based on duration and hourly rate
   const calculateEarnings = async (pin, clockIn, duration) => {
     if (!duration) return 0;
@@ -181,6 +181,37 @@ export default function TimeSheet({ sessions, formatDuration, onEditSession, onD
     return date.toISOString().slice(0, 16);
   };
 
+  // Format time/date based on user preferences
+  const formatDateTime = (isoString) => {
+    const date = new Date(isoString);
+    const timezone = selectedTimezone === 'auto' ? undefined : selectedTimezone;
+    
+    const timeOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: timeFormat === '12h',
+      timeZone: timezone
+    };
+
+    const dateOptions = {
+      timeZone: timezone
+    };
+
+    let formattedDate;
+    if (dateFormat === 'MM/DD/YYYY') {
+      formattedDate = date.toLocaleDateString('en-US', { ...dateOptions, month: '2-digit', day: '2-digit', year: 'numeric' });
+    } else if (dateFormat === 'DD/MM/YYYY') {
+      formattedDate = date.toLocaleDateString('en-GB', { ...dateOptions, day: '2-digit', month: '2-digit', year: 'numeric' });
+    } else {
+      formattedDate = date.toLocaleDateString('sv-SE', { ...dateOptions, year: 'numeric', month: '2-digit', day: '2-digit' });
+    }
+
+    const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
+
+    return `${formattedDate} ${formattedTime}`;
+  };
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
       {error && (
@@ -266,8 +297,8 @@ export default function TimeSheet({ sessions, formatDuration, onEditSession, onD
                 ) : (
                   <div>
                     <strong>{session.name}</strong> (PIN: {session.pin})<br />
-                    In: {new Date(session.clockIn).toLocaleString()}<br />
-                    Out: {new Date(session.clockOut).toLocaleString()}<br />
+                    In: {formatDateTime(session.clockIn)}<br />
+                    Out: {formatDateTime(session.clockOut)}<br />
                     Duration: {formatDuration(session.duration)}<br />
                     Earnings: ${sessionEarnings[session.id] ? sessionEarnings[session.id].toFixed(2) : "0.00"}
                     <div className="flex space-x-2 mt-2">

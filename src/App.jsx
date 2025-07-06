@@ -32,6 +32,50 @@ export default function App() {
   const [authView, setAuthView] = useState("landing"); // landing, login, signup, dashboard, pin, kiosk
   const [kioskData, setKioskData] = useState(null);
   
+  // Global time settings for kiosk views
+  const [globalTimeFormat, setGlobalTimeFormat] = useState('12h');
+  const [globalTimezone, setGlobalTimezone] = useState('auto');
+  const [globalDateFormat, setGlobalDateFormat] = useState('MM/DD/YYYY');
+  
+  // Load global time settings for kiosk views
+  useEffect(() => {
+    const loadGlobalTimeSettings = async () => {
+      try {
+        // Try to get time settings from the first admin user or a default admin
+        const { data: adminUsers, error: adminError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('is_admin', true)
+          .limit(1);
+
+        if (!adminError && adminUsers && adminUsers.length > 0) {
+          // Get the first admin user's ID from auth.users if they have preferences
+          const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+          
+          if (!authError && authUsers.users.length > 0) {
+            // Try to find preferences for any admin user
+            const { data: preferences, error: prefError } = await supabase
+              .from('user_preferences')
+              .select('*')
+              .limit(1);
+            
+            if (!prefError && preferences && preferences.length > 0) {
+              const pref = preferences[0];
+              if (pref.time_format) setGlobalTimeFormat(pref.time_format);
+              if (pref.timezone) setGlobalTimezone(pref.timezone);
+              if (pref.date_format) setGlobalDateFormat(pref.date_format);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading global time settings:', error);
+        // Keep default settings if loading fails
+      }
+    };
+
+    loadGlobalTimeSettings();
+  }, []);
+
   // Check for existing session on app load
   useEffect(() => {
     const checkSession = async () => {
@@ -260,7 +304,11 @@ export default function App() {
             <h1 className="text-4xl font-bold mb-2">SHIFTSYNC</h1>
             <p className="text-xl text-gray-600">Enter PIN to Continue</p>
           </div>
-          <Clock />
+          <Clock 
+            timeFormat={globalTimeFormat}
+            timezone={globalTimezone}
+            dateFormat={globalDateFormat}
+          />
           <Display input={input} />
           <Keypad onKeyPress={handleKeyPress} onSubmit={handleSubmit} />
           <Message text={message} />
@@ -286,7 +334,11 @@ export default function App() {
               <p className="text-sm text-gray-500 mt-2">{kioskData.description}</p>
             )}
           </div>
-          <Clock />
+          <Clock 
+            timeFormat={globalTimeFormat}
+            timezone={globalTimezone}
+            dateFormat={globalDateFormat}
+          />
           <Display input={input} />
           <Keypad onKeyPress={handleKeyPress} onSubmit={handleSubmit} />
           <Message text={message} />

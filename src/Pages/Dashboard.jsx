@@ -159,7 +159,9 @@ export default function Dashboard({ user, onLogout }) {
           .from('user_preferences')
           .upsert({
             user_id: user.id,
-            time_format: format
+            time_format: format,
+            timezone: selectedTimezone,
+            date_format: dateFormat
           });
       } catch (error) {
         console.error('Error saving time format:', error);
@@ -175,7 +177,9 @@ export default function Dashboard({ user, onLogout }) {
           .from('user_preferences')
           .upsert({
             user_id: user.id,
-            timezone: timezone
+            time_format: timeFormat,
+            timezone: timezone,
+            date_format: dateFormat
           });
       } catch (error) {
         console.error('Error saving timezone:', error);
@@ -191,6 +195,8 @@ export default function Dashboard({ user, onLogout }) {
           .from('user_preferences')
           .upsert({
             user_id: user.id,
+            time_format: timeFormat,
+            timezone: selectedTimezone,
             date_format: format
           });
       } catch (error) {
