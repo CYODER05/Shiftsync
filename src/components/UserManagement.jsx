@@ -437,7 +437,7 @@ export default function UserManagement() {
             </svg>
           </div>
         </div>
-        <table className="w-full border border-gray-300 rounded-lg shadow-md bg-white">
+        <table className="w-full rounded-lg shadow-md settings-menu">
           <thead>
             <tr>
               <th>Employee Name</th>
