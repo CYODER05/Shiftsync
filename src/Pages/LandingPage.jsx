@@ -11,8 +11,6 @@ export default function LandingPage({ onLogin, onSignup }) {
         <p className="text-xl text-gray-600">Employee Time Tracking Made Simple</p>
       </div>
       
-      <Clock />
-      
       <div className="mt-8 space-y-4 w-full max-w-md">
         <button 
           onClick={onLogin}
@@ -25,7 +23,7 @@ export default function LandingPage({ onLogin, onSignup }) {
           onClick={onSignup}
           className="w-full py-3 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-200 flex items-center justify-center"
         >
-          <span>Create Admin Account</span>
+          <span>Create Account</span>
         </button>
       </div>
       
