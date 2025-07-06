@@ -41,31 +41,17 @@ export default function App() {
   useEffect(() => {
     const loadGlobalTimeSettings = async () => {
       try {
-        // Try to get time settings from the first admin user or a default admin
-        const { data: adminUsers, error: adminError } = await supabase
-          .from('users')
+        // Try to find any user preferences to use as global settings
+        const { data: preferences, error: prefError } = await supabase
+          .from('user_preferences')
           .select('*')
-          .eq('is_admin', true)
           .limit(1);
-
-        if (!adminError && adminUsers && adminUsers.length > 0) {
-          // Get the first admin user's ID from auth.users if they have preferences
-          const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-          
-          if (!authError && authUsers.users.length > 0) {
-            // Try to find preferences for any admin user
-            const { data: preferences, error: prefError } = await supabase
-              .from('user_preferences')
-              .select('*')
-              .limit(1);
-            
-            if (!prefError && preferences && preferences.length > 0) {
-              const pref = preferences[0];
-              if (pref.time_format) setGlobalTimeFormat(pref.time_format);
-              if (pref.timezone) setGlobalTimezone(pref.timezone);
-              if (pref.date_format) setGlobalDateFormat(pref.date_format);
-            }
-          }
+        
+        if (!prefError && preferences && preferences.length > 0) {
+          const pref = preferences[0];
+          if (pref.time_format) setGlobalTimeFormat(pref.time_format);
+          if (pref.timezone) setGlobalTimezone(pref.timezone);
+          if (pref.date_format) setGlobalDateFormat(pref.date_format);
         }
       } catch (error) {
         console.error('Error loading global time settings:', error);
@@ -73,6 +59,7 @@ export default function App() {
       }
     };
 
+    // Load settings initially
     loadGlobalTimeSettings();
   }, []);
 
