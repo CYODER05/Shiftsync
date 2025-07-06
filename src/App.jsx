@@ -61,6 +61,31 @@ export default function App() {
 
     // Load settings initially
     loadGlobalTimeSettings();
+
+    // Set up real-time subscription to user_preferences changes
+    const subscription = supabase
+      .channel('user_preferences_changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'user_preferences' 
+        }, 
+        (payload) => {
+          console.log('User preferences changed, reloading global settings');
+          loadGlobalTimeSettings();
+        }
+      )
+      .subscribe();
+
+    // Also refresh settings every 30 seconds as a fallback
+    const interval = setInterval(loadGlobalTimeSettings, 30000);
+
+    // Cleanup
+    return () => {
+      subscription.unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   // Check for existing session on app load
