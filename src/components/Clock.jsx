@@ -46,7 +46,6 @@ export default function Clock({ timeFormat = '12h', timezone = 'auto', dateForma
 
   // Update formatted display when time or format settings change
   useEffect(() => {
-    console.log('Clock component props changed:', { timeFormat, timezone, dateFormat });
     setFormattedDisplay(formatTime(now));
   }, [now, timeFormat, timezone, dateFormat]);
 

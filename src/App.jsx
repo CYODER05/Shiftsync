@@ -41,16 +41,6 @@ export default function App() {
   useEffect(() => {
     const loadGlobalTimeSettings = async () => {
       try {
-        console.log('Loading global time settings...');
-        
-        // Get ALL user preferences to see what's in the database
-        const { data: allPreferences, error: allError } = await supabase
-          .from('user_preferences')
-          .select('*');
-        
-        console.log('ALL preferences in database:', allPreferences);
-        console.log('Query error (if any):', allError);
-        
         // Try to find any user preferences (most recent first)
         const { data: preferences, error: prefError } = await supabase
           .from('user_preferences')
@@ -58,35 +48,20 @@ export default function App() {
           .order('created_at', { ascending: false })
           .limit(1);
         
-        console.log('Latest preferences data:', preferences);
-        console.log('Preferences query error (if any):', prefError);
-        
         if (!prefError && preferences && preferences.length > 0) {
           const pref = preferences[0];
-          console.log('Found preferences! Details:');
-          console.log('- user_id:', pref.user_id);
-          console.log('- time_format:', pref.time_format);
-          console.log('- timezone:', pref.timezone);
-          console.log('- date_format:', pref.date_format);
-          console.log('- created_at:', pref.created_at);
           
           if (pref.time_format) {
-            console.log('Setting global time format to:', pref.time_format);
             setGlobalTimeFormat(pref.time_format);
           }
           if (pref.timezone) {
-            console.log('Setting global timezone to:', pref.timezone);
             setGlobalTimezone(pref.timezone);
           }
           if (pref.date_format) {
-            console.log('Setting global date format to:', pref.date_format);
             setGlobalDateFormat(pref.date_format);
           }
-        } else {
-          console.log('No preferences found, using defaults');
         }
       } catch (error) {
-        console.error('Error loading global time settings:', error);
         // Keep default settings if loading fails
       }
     };
@@ -104,7 +79,6 @@ export default function App() {
           table: 'user_preferences' 
         }, 
         (payload) => {
-          console.log('User preferences changed, reloading global settings');
           loadGlobalTimeSettings();
         }
       )

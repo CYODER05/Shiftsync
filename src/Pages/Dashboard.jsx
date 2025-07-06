@@ -161,83 +161,56 @@ export default function Dashboard({ user, onLogout }) {
       
       if (updateError && updateError.code === 'PGRST116') {
         // No rows updated, try to insert
-        console.log('No existing preferences found, inserting new record');
         const { data: insertData, error: insertError } = await supabase
           .from('user_preferences')
           .insert({ ...preferences, user_id: user.id });
         
         if (insertError) {
-          console.error('Insert error:', insertError);
           return { success: false, error: insertError };
         }
         
-        console.log('Preferences inserted successfully');
         return { success: true, data: insertData };
       } else if (updateError) {
-        console.error('Update error:', updateError);
         return { success: false, error: updateError };
       }
       
-      console.log('Preferences updated successfully');
       return { success: true, data: updateData };
     } catch (error) {
-      console.error('Save preferences error:', error);
       return { success: false, error };
     }
   };
 
   // Time settings handlers
   const handleTimeFormatChange = async (format) => {
-    console.log('Changing time format to:', format);
     setTimeFormat(format);
     if (user?.id) {
-      const result = await savePreferences({
+      await savePreferences({
         time_format: format,
         timezone: selectedTimezone,
         date_format: dateFormat
       });
-      
-      if (result.success) {
-        console.log('Time format saved successfully');
-      } else {
-        console.error('Failed to save time format:', result.error);
-      }
     }
   };
 
   const handleTimezoneChange = async (timezone) => {
-    console.log('Changing timezone to:', timezone);
     setSelectedTimezone(timezone);
     if (user?.id) {
-      const result = await savePreferences({
+      await savePreferences({
         time_format: timeFormat,
         timezone: timezone,
         date_format: dateFormat
       });
-      
-      if (result.success) {
-        console.log('Timezone saved successfully');
-      } else {
-        console.error('Failed to save timezone:', result.error);
-      }
     }
   };
 
   const handleDateFormatChange = async (format) => {
-    console.log('Changing date format to:', format);
     setDateFormat(format);
     if (user?.id) {
-      const result = await savePreferences({
+      await savePreferences({
         time_format: timeFormat,
         timezone: selectedTimezone,
         date_format: format
       });
-      
-      if (result.success) {
-        console.log('Date format saved successfully');
-      } else {
-        console.error('Failed to save date format:', result.error);
-      }
     }
   };
 
