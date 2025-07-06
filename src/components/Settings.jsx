@@ -162,7 +162,7 @@ export default function Settings({
 
               <div className="bg-white preview p-4 rounded-lg border dark:border-slate-600">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Preview:</h4>
-                <p className="text-lg font-mono text-gray-900 dark:text-slate-100">
+                <p className="text-lg font-mono text-gray-900">
                   {formatTimePreview(currentTime)}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
