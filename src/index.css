@@ -148,7 +148,7 @@ button:focus-visible {
   background-color: #10b981; /* Emerald green for active indicators */
 }
 
-.dark input {
+.dark input, .dark .preview {
   background-color: #334155; /* Slate background for inputs */
   color: #f1f5f9;
   border: 1px solid #475569;
