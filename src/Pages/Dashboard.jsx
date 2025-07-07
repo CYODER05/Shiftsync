@@ -1,5 +1,5 @@
 // src/Pages/Dashboard.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import Clock from '../components/Clock';
 import Display from '../components/Display';
@@ -10,6 +10,8 @@ import UserManagement from '../components/UserManagement';
 import Settings from '../components/Settings';
 import KioskManagement from '../components/KioskManagement';
 import TimeTracker from '../utils/TimeTracker';
+import SessionManager from '../utils/SessionManager';
+import ComponentStateManager from '../utils/ComponentStateManager';
 
 const tracker = new TimeTracker();
 
@@ -25,6 +27,14 @@ export default function Dashboard({ user, onLogout }) {
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dbError, setDbError] = useState(null);
+  const [showSessionWarning, setShowSessionWarning] = useState(false);
+  
+  // Refs to maintain component instances and prevent reloading
+  const adminPanelRef = useRef(null);
+  const userManagementRef = useRef(null);
+  const timeSheetRef = useRef(null);
+  const kioskManagementRef = useRef(null);
+  const settingsRef = useRef(null);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -81,6 +91,33 @@ export default function Dashboard({ user, onLogout }) {
 
     loadUserData();
   }, [user]);
+
+  // Initialize session management
+  useEffect(() => {
+    const handleSessionWarning = () => {
+      setShowSessionWarning(true);
+    };
+
+    const handleSessionLogout = () => {
+      // Clean up component states
+      ComponentStateManager.clearAllStates();
+      handleLogout();
+    };
+
+    // Initialize session manager
+    SessionManager.init(handleSessionLogout, handleSessionWarning);
+
+    // Cleanup on unmount
+    return () => {
+      SessionManager.cleanup();
+    };
+  }, []);
+
+  // Save component state when switching views
+  useEffect(() => {
+    // Save current view state when it changes
+    ComponentStateManager.saveState('dashboard', { currentView });
+  }, [currentView]);
 
   const formatDuration = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
@@ -409,14 +446,16 @@ export default function Dashboard({ user, onLogout }) {
           <div className="flex-1 overflow-auto">
             {currentView === 'timeTracking' && (
               <AdminPanel 
+                key="admin-panel"
                 timeFormat={timeFormat}
                 selectedTimezone={selectedTimezone}
                 dateFormat={dateFormat}
               />
             )}
-            {currentView === 'users' && <UserManagement />}
+            {currentView === 'users' && <UserManagement key="user-management" />}
             {currentView === 'timeSheet' && (
               <TimeSheet
+                key="time-sheet"
                 sessions={sessions}
                 formatDuration={formatDuration}
                 onEditSession={handleEditSession}
@@ -427,9 +466,10 @@ export default function Dashboard({ user, onLogout }) {
                 dateFormat={dateFormat}
               />
             )}
-            {currentView === 'kiosk' && <KioskManagement />}
+            {currentView === 'kiosk' && <KioskManagement key="kiosk-management" />}
             {currentView === 'settings' && (
               <Settings
+                key="settings"
                 backgroundColorMode={backgroundColorMode}
                 toggleBackgroundColorMode={toggleBackgroundColorMode}
                 timeFormat={timeFormat}
@@ -443,6 +483,49 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         </div>
       </div>
+
+      {/* Session Warning Modal */}
+      {showSessionWarning && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-medium text-gray-900">Session Expiring Soon</h3>
+              </div>
+            </div>
+            <div className="mb-4">
+              <p className="text-sm text-gray-700">
+                Your session will expire in 5 minutes due to inactivity. Would you like to continue your session?
+              </p>
+            </div>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowSessionWarning(false);
+                  handleLogout();
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+              >
+                Log Out Now
+              </button>
+              <button
+                onClick={() => {
+                  setShowSessionWarning(false);
+                  SessionManager.resetTimer();
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                Continue Session
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
