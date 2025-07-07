@@ -12,14 +12,19 @@ import KioskManagement from '../components/KioskManagement';
 import TimeTracker from '../utils/TimeTracker';
 import SessionManager from '../utils/SessionManager';
 import ComponentStateManager from '../utils/ComponentStateManager';
+import PageLifecycleManager from '../utils/PageLifecycleManager';
+import AppStateManager from '../utils/AppStateManager';
 
 const tracker = new TimeTracker();
 
 export default function Dashboard({ user, onLogout }) {
-  // Try to restore dashboard state
+  // Try to restore complete app state first
+  const savedAppState = AppStateManager.restoreAppState();
   const savedDashboardState = ComponentStateManager.getState('dashboard');
   
-  const [currentView, setCurrentView] = useState(savedDashboardState?.currentView || 'timeTracking');
+  // Use app state if available, fallback to component state, then default
+  const initialView = savedAppState?.currentView || savedDashboardState?.currentView || 'timeTracking';
+  const [currentView, setCurrentView] = useState(initialView);
   const [userName, setUserName] = useState('');
   const [userPin, setUserPin] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -95,7 +100,7 @@ export default function Dashboard({ user, onLogout }) {
     loadUserData();
   }, [user]);
 
-  // Initialize session management
+  // Initialize session management and page lifecycle
   useEffect(() => {
     const handleSessionWarning = () => {
       setShowSessionWarning(true);
@@ -104,29 +109,66 @@ export default function Dashboard({ user, onLogout }) {
     const handleSessionLogout = () => {
       // Clean up component states
       ComponentStateManager.clearAllStates();
+      AppStateManager.clearAppState();
       handleLogout();
     };
 
     // Initialize session manager
     SessionManager.init(handleSessionLogout, handleSessionWarning);
 
-    // Handle page visibility changes to prevent unnecessary reloads
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        // Page became visible again - clean up stale states
-        ComponentStateManager.cleanupStaleStates();
+    // Function to get current app state for saving
+    const getCurrentAppState = () => ({
+      currentView,
+      timeFormat,
+      selectedTimezone,
+      dateFormat,
+      backgroundColorMode,
+      userName,
+      userPin
+    });
+
+    // Handle page lifecycle events
+    const handlePageVisibilityChange = (state) => {
+      switch (state) {
+        case 'visible':
+        case 'focus':
+        case 'resume':
+          // Page became visible again - clean up stale states
+          ComponentStateManager.cleanupStaleStates();
+          break;
+        case 'hidden':
+        case 'blur':
+        case 'freeze':
+          // Page is being hidden - save current state
+          const currentState = getCurrentAppState();
+          ComponentStateManager.saveState('dashboard', { currentView });
+          AppStateManager.saveAppState(currentState);
+          break;
       }
     };
 
-    // Add visibility change listener
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    const handleBeforeUnload = () => {
+      // Save state before page unloads
+      const currentState = getCurrentAppState();
+      ComponentStateManager.saveState('dashboard', { currentView });
+      AppStateManager.saveAppState(currentState);
+    };
+
+    // Set up AppStateManager beforeunload handler
+    const cleanupAppStateHandler = AppStateManager.setupBeforeUnloadHandler(getCurrentAppState);
+
+    // Add page lifecycle handlers
+    PageLifecycleManager.addVisibilityChangeHandler(handlePageVisibilityChange);
+    PageLifecycleManager.addBeforeUnloadHandler(handleBeforeUnload);
 
     // Cleanup on unmount
     return () => {
       SessionManager.cleanup();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      PageLifecycleManager.removeVisibilityChangeHandler(handlePageVisibilityChange);
+      PageLifecycleManager.removeBeforeUnloadHandler(handleBeforeUnload);
+      cleanupAppStateHandler();
     };
-  }, []);
+  }, [currentView, timeFormat, selectedTimezone, dateFormat, backgroundColorMode, userName, userPin]);
 
   // Save component state when switching views
   useEffect(() => {
