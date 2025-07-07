@@ -1,31 +1,24 @@
 // src/components/AdminPanel.jsx
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import TimeTracker from "../utils/TimeTracker";
 import DateRangePicker, { getDateRange } from "../components/DateRangePicker";
 import { supabase } from "../supabaseClient";
 import eventBus from "../utils/EventBus";
-import ComponentStateManager from "../utils/ComponentStateManager";
 
 const tracker = new TimeTracker();
 
 export default function AdminPanel() {
-  // Try to restore state from ComponentStateManager
-  const savedState = ComponentStateManager.getState('adminPanel');
-  
   const [sessions, setSessions] = useState([]);
   const [active, setActive] = useState([]);
   const [users, setUsers] = useState([]);
   const [now, setNow] = useState(Date.now());
-  const [sortBy, setSortBy] = useState(savedState?.sortBy || "name"); // 'name', 'time', 'earnings'
-  // Initialize with "This Week" date range or saved state
-  const [dateRange, setDateRange] = useState(savedState?.dateRange || [null, null]);
+  const [sortBy, setSortBy] = useState("name"); // 'name', 'time', 'earnings'
+  // Initialize with "This Week" date range
+  const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0); // Add a refresh trigger state
-  
-  // Ref to track if component has been initialized
-  const isInitialized = useRef(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -225,18 +218,6 @@ export default function AdminPanel() {
       userDeletedUnsubscribe();
     };
   }, []);
-
-  // Save component state when key values change
-  useEffect(() => {
-    if (isInitialized.current) {
-      ComponentStateManager.saveState('adminPanel', {
-        sortBy,
-        dateRange,
-      });
-    } else {
-      isInitialized.current = true;
-    }
-  }, [sortBy, dateRange]);
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
