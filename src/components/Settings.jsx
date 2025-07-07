@@ -98,13 +98,13 @@ export default function Settings({
       </div>
 
       <div className="max-w-2xl">
-        <div className="settings-menu rounded-lg shadow-md p-6 space-y-6 border dark:border-slate-600">
+        <div className="settings-menu rounded-lg shadow-md p-6 space-y-6 card-primary">
           <div className="setting-option">
             <label className="block text-sm font-medium mb-2">
               Background Color Mode:
             </label>
             <select
-              className="w-full sm:w-auto p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="select-primary w-full sm:w-auto p-3 rounded-lg"
               value={backgroundColorMode}
               onChange={(e) => toggleBackgroundColorMode(e.target.value)}
             >
@@ -131,7 +131,7 @@ export default function Settings({
                   Time Format:
                 </label>
                 <select
-                  className="w-full sm:w-auto p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="select-primary w-full sm:w-auto p-3 rounded-lg"
                   value={timeFormat}
                   onChange={(e) => onTimeFormatChange(e.target.value)}
                 >
@@ -151,7 +151,7 @@ export default function Settings({
                   Timezone:
                 </label>
                 <select
-                  className="w-full sm:w-auto p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="select-primary w-full sm:w-auto p-3 rounded-lg"
                   value={selectedTimezone}
                   onChange={(e) => onTimezoneChange(e.target.value)}
                 >
@@ -171,7 +171,7 @@ export default function Settings({
                   Date Format:
                 </label>
                 <select
-                  className="w-full sm:w-auto p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="select-primary w-full sm:w-auto p-3 rounded-lg"
                   value={dateFormat}
                   onChange={(e) => onDateFormatChange(e.target.value)}
                 >
@@ -186,7 +186,7 @@ export default function Settings({
                 </p>
               </div>
 
-              <div className="bg-white preview p-4 rounded-lg border dark:border-slate-600">
+              <div className="preview p-4 rounded-lg card-primary">
                 <h4 className="text-sm font-medium text-gray-700 preview-text mb-2">Preview:</h4>
                 <p className="text-lg font-mono text-gray-900 time-preview">
                   {formatTimePreview(currentTime)}
@@ -221,7 +221,7 @@ export default function Settings({
             <div className="space-y-3">
               <button
                 onClick={() => window.location.reload()}
-                className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="btn-primary w-full sm:w-auto px-4 py-2 rounded-lg transition-colors"
               >
                 Refresh Application
               </button>
