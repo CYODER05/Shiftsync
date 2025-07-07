@@ -104,26 +104,19 @@ button:focus-visible {
   color: #262624; 
 }
 
-.light .dashboard-head {
+.light .dashboard-head,
+.light .sidebar {
   background-color: rgb(255, 255, 255);
   color: #262624;
 }
 
-.light .dash-table-bg {
-  background-color: rgb(255, 255, 255);
-}
-
+.light .dash-table-bg,
 .light .session-history-bg {
   background-color: rgb(255, 255, 255);
 }
 
 .light .active-icon-bg {
   background-color: #c7c4bc;
-}
-
-.light .sidebar {
-  background-color: rgb(255, 255, 255);
-  color: #262624; 
 }
 
 .light .message {
