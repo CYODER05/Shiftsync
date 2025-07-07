@@ -83,6 +83,22 @@ button:focus-visible {
   color: #e2e8f0; /* Light slate text */
 }
 
+/* System theme class - will be resolved to light or dark by JavaScript */
+.system {
+  /* This class will be dynamically replaced with .light or .dark */
+  /* but we include fallback styles just in case */
+  background-color: oklch(92.2% 0 0);
+  color: #36454F;
+}
+
+/* System theme follows OS preference */
+@media (prefers-color-scheme: dark) {
+  .system {
+    background-color: #0f172a;
+    color: #e2e8f0;
+  }
+}
+
 /* Element-specific text colors for light mode */
 .light h1, .light h2, .light h3 {
   color: #262624; 

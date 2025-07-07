@@ -18,13 +18,33 @@ export default function Dashboard({ user, onLogout }) {
   const [userName, setUserName] = useState('');
   const [userPin, setUserPin] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [backgroundColorMode, setBackgroundColorMode] = useState('light');
+  const [backgroundColorMode, setBackgroundColorMode] = useState('system');
   const [timeFormat, setTimeFormat] = useState('12h');
   const [selectedTimezone, setSelectedTimezone] = useState('auto');
   const [dateFormat, setDateFormat] = useState('MM/DD/YYYY');
+  const [systemColorMode, setSystemColorMode] = useState('light');
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dbError, setDbError] = useState(null);
+
+  // System color mode detection effect
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleSystemThemeChange = (e) => {
+      setSystemColorMode(e.matches ? 'dark' : 'light');
+    };
+    
+    // Set initial system color mode
+    setSystemColorMode(mediaQuery.matches ? 'dark' : 'light');
+    
+    // Listen for system theme changes
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, []);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -43,6 +63,7 @@ export default function Dashboard({ user, onLogout }) {
               if (preferences.time_format) setTimeFormat(preferences.time_format);
               if (preferences.timezone) setSelectedTimezone(preferences.timezone);
               if (preferences.date_format) setDateFormat(preferences.date_format);
+              if (preferences.color_mode) setBackgroundColorMode(preferences.color_mode);
             }
           } catch (error) {
             console.error('Error loading user preferences:', error);
@@ -146,8 +167,16 @@ export default function Dashboard({ user, onLogout }) {
     setCurrentView('kiosk');
   };
 
-  const toggleBackgroundColorMode = (mode) => {
+  const toggleBackgroundColorMode = async (mode) => {
     setBackgroundColorMode(mode);
+    if (user?.id) {
+      await savePreferences({
+        time_format: timeFormat,
+        timezone: selectedTimezone,
+        date_format: dateFormat,
+        color_mode: mode
+      });
+    }
   };
 
   // Helper function to save preferences with fallback
@@ -187,7 +216,8 @@ export default function Dashboard({ user, onLogout }) {
       await savePreferences({
         time_format: format,
         timezone: selectedTimezone,
-        date_format: dateFormat
+        date_format: dateFormat,
+        color_mode: backgroundColorMode
       });
     }
   };
@@ -198,7 +228,8 @@ export default function Dashboard({ user, onLogout }) {
       await savePreferences({
         time_format: timeFormat,
         timezone: timezone,
-        date_format: dateFormat
+        date_format: dateFormat,
+        color_mode: backgroundColorMode
       });
     }
   };
@@ -209,7 +240,8 @@ export default function Dashboard({ user, onLogout }) {
       await savePreferences({
         time_format: timeFormat,
         timezone: selectedTimezone,
-        date_format: format
+        date_format: format,
+        color_mode: backgroundColorMode
       });
     }
   };
@@ -242,8 +274,16 @@ export default function Dashboard({ user, onLogout }) {
     );
   }
 
+  // Get the effective color mode (resolve 'system' to actual theme)
+  const getEffectiveColorMode = () => {
+    if (backgroundColorMode === 'system') {
+      return systemColorMode;
+    }
+    return backgroundColorMode;
+  };
+
   return (
-    <div className={`app-container ${backgroundColorMode} min-h-screen`}>
+    <div className={`app-container ${getEffectiveColorMode()} min-h-screen`}>
       <div className="flex flex-col h-screen">
         {/* Header */}
         <div className="dashboard-head sticky top-0 z-20 w-full flex justify-between items-center px-4 py-3 shadow-md">

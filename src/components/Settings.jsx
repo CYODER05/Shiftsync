@@ -11,6 +11,26 @@ export default function Settings({
   onTimezoneChange,
   onDateFormatChange
 }) {
+  const [systemColorMode, setSystemColorMode] = useState('light');
+
+  // System color mode detection effect
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleSystemThemeChange = (e) => {
+      setSystemColorMode(e.matches ? 'dark' : 'light');
+    };
+    
+    // Set initial system color mode
+    setSystemColorMode(mediaQuery.matches ? 'dark' : 'light');
+    
+    // Listen for system theme changes
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, []);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // US Timezones
@@ -90,9 +110,15 @@ export default function Settings({
             >
               <option value="light">Light Mode</option>
               <option value="dark">Dark Mode</option>
+              <option value="system">System Default</option>
             </select>
             <p className="text-sm text-muted mt-2">
-              Choose between light and dark theme for the application interface.
+              Choose between light mode, dark mode, or follow your system's theme preference.
+              {backgroundColorMode === 'system' && (
+                <span className="block mt-1 text-xs">
+                  Currently using: <strong>{systemColorMode === 'dark' ? 'Dark' : 'Light'}</strong> (detected from system)
+                </span>
+              )}
             </p>
           </div>
 
