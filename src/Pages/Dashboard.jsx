@@ -16,7 +16,10 @@ import ComponentStateManager from '../utils/ComponentStateManager';
 const tracker = new TimeTracker();
 
 export default function Dashboard({ user, onLogout }) {
-  const [currentView, setCurrentView] = useState('timeTracking');
+  // Try to restore dashboard state
+  const savedDashboardState = ComponentStateManager.getState('dashboard');
+  
+  const [currentView, setCurrentView] = useState(savedDashboardState?.currentView || 'timeTracking');
   const [userName, setUserName] = useState('');
   const [userPin, setUserPin] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -107,9 +110,21 @@ export default function Dashboard({ user, onLogout }) {
     // Initialize session manager
     SessionManager.init(handleSessionLogout, handleSessionWarning);
 
+    // Handle page visibility changes to prevent unnecessary reloads
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Page became visible again - clean up stale states
+        ComponentStateManager.cleanupStaleStates();
+      }
+    };
+
+    // Add visibility change listener
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     // Cleanup on unmount
     return () => {
       SessionManager.cleanup();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
