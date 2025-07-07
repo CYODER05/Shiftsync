@@ -32,8 +32,10 @@ export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [name, setName] = useState("");
   const [pin, setPin] = useState("");
+  const [email, setEmail] = useState(""); // Add email state
   const [hourlyRate, setHourlyRate] = useState("");
-  const [role, setRole] = useState(""); // Add state for role
+  const [role, setRole] = useState("member"); // Default to member
+  const [activeTab, setActiveTab] = useState("members"); // Add tab state
   const [error, setError] = useState("");
   const [editingPin, setEditingPin] = useState(null); // Track which user is being edited
   const [showModal, setShowModal] = useState(false); // Control modal visibility
@@ -108,13 +110,14 @@ export default function UserManagement() {
   const handleAddUser = async () => {
     setIsLoading(true);
     try {
-      const success = await tracker.addUser(pin, name, parseFloat(hourlyRate), role);
+      const success = await tracker.addUser(pin, name, parseFloat(hourlyRate), role, email);
       if (!success) {
         setError("Failed to add user. PIN might already exist or input is invalid.");
         return;
       }
       setName("");
       setPin("");
+      setEmail("");
       setHourlyRate("");
       setRole("");
       setError("");
@@ -150,6 +153,7 @@ export default function UserManagement() {
     if (user) {
       setName(user.name);
       setPin(user.pin);
+      setEmail(user.email || "");
       try {
         const rate = await tracker.getHourlyRate(pin);
         setHourlyRate(rate);
@@ -227,6 +231,7 @@ export default function UserManagement() {
     setEditingPin(null); // Exit edit mode
     setName("");
     setPin("");
+    setEmail("");
     setHourlyRate("");
     setRole("");
     setError("");
@@ -269,90 +274,287 @@ export default function UserManagement() {
     return newPin;
   };
 
-  const openAddUserModal = () => {
+  const openAddUserModal = (defaultRole = "member") => {
     setName("");
     setPin(generateUniquePin()); // Pre-fill with a unique PIN
+    setEmail("");
     setHourlyRate("");
-    setRole("");
+    setRole(defaultRole);
     setError("");
     setEditingPin(null);
     setApplyRateToAllEntries(false); // Reset the option
     setShowModal(true);
   };
 
-  return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 lg:py-10 space-y-6">
-      <h2 className="text-xl sm:text-2xl font-bold">User Management</h2>
+  // Filter users based on active tab and search term
+  const getFilteredUsers = () => {
+    return users.filter(user => {
+      const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesTab = activeTab === "all" || 
+                        (activeTab === "admin" && user.role?.toLowerCase() === "admin") ||
+                        (activeTab === "members" && (!user.role || user.role.toLowerCase() !== "admin"));
+      return matchesSearch && matchesTab;
+    });
+  };
 
-      <div className="mb-4">
-        <button
-          onClick={openAddUserModal}
-          className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        >
-          Add Employee
-        </button>
+  const getTabCounts = () => {
+    const adminCount = users.filter(user => user.role?.toLowerCase() === "admin").length;
+    const memberCount = users.filter(user => !user.role || user.role.toLowerCase() !== "admin").length;
+    return { adminCount, memberCount, totalCount: users.length };
+  };
+
+  const { adminCount, memberCount } = getTabCounts();
+  const filteredUsers = getFilteredUsers();
+
+  return (
+    <div className="w-full h-full bg-slate-50 dark:bg-slate-900">
+      {/* Header */}
+      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4">
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Team Management</h1>
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+        <div className="px-6">
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab("members")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === "members"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+              }`}
+            >
+              MEMBERS ({memberCount})
+            </button>
+            <button
+              onClick={() => setActiveTab("admin")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === "admin"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+              }`}
+            >
+              ADMIN ({adminCount})
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div className="p-6">
+        {/* Search and Actions Bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <svg className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search by name or email"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => openAddUserModal(activeTab === "admin" ? "admin" : "member")}
+              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              ADD {activeTab === "admin" ? "ADMIN" : "MEMBER"}
+            </button>
+            <button className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium rounded-lg transition-colors">
+              Export
+            </button>
+          </div>
+        </div>
+
+        {/* Members Table */}
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white">
+              {activeTab === "admin" ? "Administrators" : "Team Members"}
+            </h3>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-50 dark:bg-slate-700">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    NAME
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    EMAIL
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    BILLABLE RATE (USD)
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    ROLE
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    ACTIONS
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+                {filteredUsers.map((user) => (
+                  <tr key={user.pin} className="hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                            <span className="text-sm font-medium text-white">
+                              {user.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-slate-900 dark:text-white">
+                            {user.name}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-slate-500 dark:text-slate-400">
+                        {user.email || `user${user.pin}@company.com`}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-slate-900 dark:text-white">
+                          <HourlyRateDisplay pin={user.pin} refreshTrigger={refreshTrigger} />
+                        </span>
+                        <button
+                          onClick={() => openRateEditModal(user.pin)}
+                          className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                        >
+                          Change
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        user.role?.toLowerCase() === "admin"
+                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                      }`}>
+                        {user.role?.toLowerCase() === "admin" ? "Admin" : "Member"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleEditUser(user.pin)}
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(user.pin)}
+                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filteredUsers.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-12 text-center">
+                      <div className="text-slate-500 dark:text-slate-400">
+                        {searchTerm ? `No users found matching "${searchTerm}"` : `No ${activeTab} found`}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       {/* User Modal */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center backdrop-blur-[2px] justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-full text-black">
-            <h3 className="text-xl font-bold mb-4">
-              {editingPin ? "Edit Employee" : "Add New Employee"}
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl w-96 max-w-full">
+            <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">
+              {editingPin ? "Edit Employee" : `Add New ${role === "admin" ? "Admin" : "Member"}`}
             </h3>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Name"
-                className="w-full p-2 border rounded"
+                placeholder="Full Name"
+                className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email Address"
+                type="email"
+                className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <input
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 placeholder="4-digit PIN"
                 maxLength="4"
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               {!editingPin && (
                 <input
                   value={hourlyRate}
                   onChange={(e) => setHourlyRate(e.target.value)}
-                  placeholder="Hourly Rate"
+                  placeholder="Hourly Rate (USD)"
                   type="number"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               )}
-              <input
+              <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                placeholder="Role (optional)"
-                className="w-full p-2 border rounded"
-              />
+                className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="member">Member</option>
+                <option value="admin">Admin</option>
+              </select>
               
-              {error && <p className="text-red-600">{error}</p>}
+              {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
               
-              <div className="flex justify-end space-x-2 mt-4">
+              <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={handleCancelEdit}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
                 {editingPin ? (
                   <button
                     onClick={handleUpdateUser}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    disabled={isLoading}
                   >
-                    Update
+                    {isLoading ? "Updating..." : "Update"}
                   </button>
                 ) : (
                   <button
                     onClick={handleAddUser}
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    disabled={isLoading}
                   >
-                    Add
+                    {isLoading ? "Adding..." : "Add Employee"}
                   </button>
                 )}
               </div>
@@ -363,140 +565,55 @@ export default function UserManagement() {
 
       {/* Hourly Rate Modal */}
       {showRateModal && (
-        <div className="fixed inset-0 flex items-center backdrop-blur-[2px] justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-full text-black">
-            <h3 className="text-xl font-bold mb-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl w-96 max-w-full">
+            <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">
               Edit Hourly Rate
             </h3>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               <input
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(e.target.value)}
-                placeholder="Hourly Rate"
+                placeholder="Hourly Rate (USD)"
                 type="number"
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               
-              <div className="flex items-center mt-2">
+              <div className="flex items-center">
                 <input
                   type="checkbox"
                   id="applyRateToAllEntries"
                   checked={applyRateToAllEntries}
                   onChange={(e) => setApplyRateToAllEntries(e.target.checked)}
-                  className="mr-2"
+                  className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
                 />
-                <label htmlFor="applyRateToAllEntries">
+                <label htmlFor="applyRateToAllEntries" className="text-sm text-slate-700 dark:text-slate-300">
                   Apply new hourly rate to all past entries
                 </label>
               </div>
               
-              {error && <p className="text-red-600">{error}</p>}
+              {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
               
-              <div className="flex justify-end space-x-2 mt-4">
+              <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={handleCancelRateEdit}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateHourlyRate}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  disabled={isLoading}
                 >
-                  Update
+                  {isLoading ? "Updating..." : "Update Rate"}
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
-
-        <div className="flex justify-between items-center mb-2">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="p-2 pl-8 border rounded-lg"
-            />
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-5 w-5 absolute left-2 top-2.5 text-gray-400" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
-              />
-            </svg>
-          </div>
-        </div>
-        <table className="w-full rounded-lg shadow-md settings-menu">
-          <thead>
-            <tr>
-              <th>Employee Name</th>
-              <th>Role</th>
-              <th>Rate</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody className="space-y-2">
-          {users
-            .filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
-            .map(({ name, pin, role }) => (
-              <tr key={pin} className="p-3 text-center [&:not(:last-child)]:border-b border-dashed border-[#eae7dc]">
-                <td>
-                  <div className="h-[3rem] flex items-center justify-center">
-                      <strong>{name}</strong>
-                  </div>
-                </td>
-                <td>
-                  {role && <span className="ml-2 text-gray-600">• {role}</span>}
-                </td>
-                <td>
-                  <span className="ml-2 bg-[#eae7dc]">
-                    <HourlyRateDisplay pin={pin} refreshTrigger={refreshTrigger} />
-                    <button
-                      onClick={() => openRateEditModal(pin)}
-                      className="ml-2 px-2 bg-green-500 text-white hover:bg-green-600 text-xs"
-                    >
-                      Edit
-                    </button>
-                  </span>
-                </td>
-                <td>
-                  <div>
-                    <button
-                      onClick={() => handleEditUser(pin)}
-                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(pin)}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-          ))}
-          {users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
-            <tr>
-              <td colSpan="4" className="text-center py-4 text-gray-500">
-                No users found matching "{searchTerm}"
-              </td>
-            </tr>
-          )}
-          </tbody>
-        </table>
-      </div>
+    </div>
   );
 }

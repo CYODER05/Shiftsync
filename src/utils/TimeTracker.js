@@ -531,7 +531,7 @@ export default class TimeTracker {
     }
   }
 
-  async addUser(pin, name, hourlyRate, role = "") {
+  async addUser(pin, name, hourlyRate, role = "", email = "") {
     try {
       if (!pin || !name) return false;
       
@@ -571,6 +571,7 @@ export default class TimeTracker {
         .insert({
           pin,
           name,
+          email,
           current_hourly_rate: rate,
           role,
           owner_id: currentUser.id
@@ -881,6 +882,7 @@ export default class TimeTracker {
       return data.map(user => ({
         pin: user.pin,
         name: user.name,
+        email: user.email || "",
         role: user.role || ""
       }));
     } catch (error) {
