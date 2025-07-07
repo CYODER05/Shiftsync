@@ -405,7 +405,7 @@ export default function UserManagement() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+              <tbody className="dash-table-bg divide-y divide-slate-200 dark:divide-slate-700">
                 {filteredUsers.map((user) => (
                   <tr key={user.pin} className="hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
