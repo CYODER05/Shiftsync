@@ -52,7 +52,7 @@ export default function KioskTable({ kiosks, onToggleStatus, onDelete }) {
       {/* Mobile Card View */}
       <div className="block sm:hidden space-y-4">
         {kiosks.map((kiosk) => (
-          <div key={kiosk.id} className="bg-white border border-gray-300 rounded-lg shadow-md p-4">
+          <div key={kiosk.id} className="dash-table-bg border border-gray-300 rounded-lg shadow-md p-4">
             <div className="flex justify-between items-start mb-3">
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">{kiosk.name}</h3>
