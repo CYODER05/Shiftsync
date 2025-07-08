@@ -26,23 +26,7 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
     }
 
     try {
-      // First, try to reset password for this email to check if it exists
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://example.com/reset' // dummy URL, we just want to check if email exists
-      });
-
-      // If reset password succeeds, it means the email exists
-      if (!resetError) {
-        setError('This email is already associated with an account. Please use a different email or try signing in.');
-        setLoading(false);
-        return;
-      }
-
-      // If we get a specific error about email not found, proceed with signup
-      // Otherwise, if it's a different error, still try to sign up
-      console.log('Reset password check result:', resetError);
-
-      // Attempt to sign up - Supabase will handle duplicate email detection
+      // Attempt to sign up - let Supabase handle duplicate email detection
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -54,7 +38,6 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
         },
       });
 
-      // Log the full error for debugging
       if (authError) {
         console.error('Signup error details:', {
           message: authError.message,
@@ -62,25 +45,13 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
           code: authError.code,
           fullError: authError
         });
-      }
 
-      if (authError) {
-        // Check for various duplicate email error patterns
+        // Check for specific duplicate email error patterns from Supabase
         const isDuplicateEmail = 
           authError.message.includes('User already registered') || 
           authError.message.includes('already been registered') ||
           authError.message.includes('email address is already registered') ||
-          authError.message.includes('already exists') ||
-          authError.message.includes('duplicate') ||
-          authError.message.includes('Email rate limit exceeded') ||
-          authError.message.includes('signup_disabled') ||
-          authError.message.includes('To signup, please provide your email') ||
-          authError.code === 'user_already_exists' ||
-          authError.code === 'email_address_invalid' ||
-          authError.code === 'signup_disabled' ||
-          authError.code === 'email_address_not_authorized' ||
-          authError.status === 422 ||
-          authError.status === 400;
+          authError.code === 'user_already_exists';
 
         if (isDuplicateEmail) {
           setError('This email is already associated with an account. Please use a different email or try signing in.');
@@ -91,53 +62,19 @@ export default function SignupPage({ onBack, onSignupSuccess }) {
         return;
       }
 
-      // Additional check: if signup returns a user but no session, it might be a duplicate
-      if (authData && authData.user && !authData.session) {
-        console.log('Signup returned user but no session - possible duplicate');
-        setError('This email is already associated with an account. Please use a different email or try signing in.');
-        setLoading(false);
-        return;
-      }
-
-      // Check if signup was successful but user already exists (some Supabase configurations)
-      if (authData && authData.user && !authData.user.email_confirmed_at && authData.user.created_at) {
-        const createdTime = new Date(authData.user.created_at);
-        const now = new Date();
-        const timeDiff = now - createdTime;
+      // Success case
+      if (authData && authData.user) {
+        setSuccessMessage(
+          'Account created successfully! Please check your email for verification instructions. Once verified, you can sign in to access the admin panel.'
+        );
         
-        // If the user was created more than 10 seconds ago, it might be an existing user
-        if (timeDiff > 10000) {
-          setError('This email is already associated with an account. Please use a different email or try signing in.');
-          setLoading(false);
-          return;
-        }
+        // Call the success callback
+        onSignupSuccess(authData.user);
       }
-
-      setSuccessMessage(
-        'Account created successfully! Please check your email for verification instructions. Once verified, you can sign in to access the admin panel.'
-      );
-      
-      // Call the success callback
-      onSignupSuccess(authData.user);
     } catch (error) {
       // Handle any unexpected errors
-      console.error('Signup error:', error);
-      
-      const isDuplicateEmail = error.message && (
-        error.message.includes('already registered') || 
-        error.message.includes('already been registered') ||
-        error.message.includes('email address is already registered') ||
-        error.message.includes('Invalid login credentials') ||
-        error.message.includes('Email not confirmed') ||
-        error.message.includes('duplicate') ||
-        error.message.includes('already exists')
-      );
-
-      if (isDuplicateEmail) {
-        setError('This email is already associated with an account. Please use a different email or try signing in.');
-      } else {
-        setError(error.message || 'An error occurred during signup');
-      }
+      console.error('Unexpected signup error:', error);
+      setError(error.message || 'An unexpected error occurred during signup');
     } finally {
       setLoading(false);
     }
