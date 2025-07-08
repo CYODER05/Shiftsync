@@ -373,7 +373,7 @@ export default function UserManagement() {
         </div>
 
         {/* Members Table */}
-        <div className="dash-table-bg rounded-lg shadow-sm border overflow-hidden">
+        <div className="dash-table-bg rounded-lg shadow-md border border-gray-300 overflow-hidden">
           <div className="px-6 py-4 border-b">
             <h3 className="text-lg font-medium">
               {activeTab === "admin" ? "Administrators" : "Team Members"}
