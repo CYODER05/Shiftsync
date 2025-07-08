@@ -422,7 +422,7 @@ export default function UserManagement() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-slate-500 dark:text-slate-400">
-                        {user.email || `user${user.pin}@company.com`}
+                        {user.email || ''}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -482,7 +482,7 @@ export default function UserManagement() {
 
       {/* User Modal */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-0">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl w-96 max-w-full">
             <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">
               {editingPin ? "Edit Employee" : `Add New ${role === "admin" ? "Admin" : "Member"}`}
@@ -518,14 +518,13 @@ export default function UserManagement() {
                   className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               )}
-              <select
+              <input
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
+                placeholder="Role"
                 className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="member">Member</option>
-                <option value="admin">Admin</option>
-              </select>
+              </input>
               
               {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
               
