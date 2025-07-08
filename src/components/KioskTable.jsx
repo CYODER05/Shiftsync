@@ -134,7 +134,7 @@ export default function KioskTable({ kiosks, onToggleStatus, onDelete }) {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden sm:block rounded-lg">
+      <div className="hidden sm:block rounded-lg overflow-hidden">
         <table className="w-full border border-gray-300 rounded-lg shadow-md bg-white">
           <thead>
             <tr>
