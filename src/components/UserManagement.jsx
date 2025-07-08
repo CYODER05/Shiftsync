@@ -154,11 +154,29 @@ export default function UserManagement() {
         setError("Failed to add user. PIN might already exist or input is invalid.");
         return;
       }
+
+      // If a role was selected, update the user's position_id in the database
+      if (selectedRoleId) {
+        try {
+          const { error } = await supabase
+            .from('users')
+            .update({ position_id: selectedRoleId })
+            .eq('pin', pin);
+          
+          if (error) {
+            console.error("Error assigning role to user:", error);
+          }
+        } catch (roleError) {
+          console.error("Error updating user role:", roleError);
+        }
+      }
+
       setName("");
       setPin("");
       setEmail("");
       setHourlyRate("");
       setRole("");
+      setSelectedRoleId("");
       setError("");
       setShowModal(false); // Close modal after successful add
       await refreshUsers();
@@ -201,6 +219,7 @@ export default function UserManagement() {
         setHourlyRate(0);
       }
       setRole(user.role || ""); // Set role from user data
+      setSelectedRoleId(user.position_id || ""); // Set the selected role ID
       setShowModal(true); // Show modal for editing
     }
   };
@@ -273,6 +292,7 @@ export default function UserManagement() {
     setEmail("");
     setHourlyRate("");
     setRole("");
+    setSelectedRoleId(""); // Reset selected role
     setError("");
     setShowModal(false); // Hide modal
     setApplyRateToAllEntries(false); // Reset the option
@@ -721,13 +741,27 @@ export default function UserManagement() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            user.role?.toLowerCase() === "admin"
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                              : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          }`}>
-                            {user.role?.toLowerCase() === "admin" ? "Admin" : "Member"}
-                          </span>
+                          {user.position_id ? (
+                            (() => {
+                              const userRole = roles.find(role => role.id === user.position_id);
+                              return userRole ? (
+                                <span 
+                                  className="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-white"
+                                  style={{ backgroundColor: userRole.color }}
+                                >
+                                  {userRole.name}
+                                </span>
+                              ) : (
+                                <span className="text-sm text-slate-500 dark:text-slate-400">
+                                  No role assigned
+                                </span>
+                              );
+                            })()
+                          ) : (
+                            <span className="text-sm text-slate-500 dark:text-slate-400">
+                              No role assigned
+                            </span>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center gap-2">
@@ -802,13 +836,18 @@ export default function UserManagement() {
                   className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               )}
-              <input
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                placeholder="Role"
+              <select
+                value={selectedRoleId}
+                onChange={(e) => setSelectedRoleId(e.target.value)}
                 className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-              </input>
+                <option value="">Select a role (optional)</option>
+                {roles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
               
               {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
               
