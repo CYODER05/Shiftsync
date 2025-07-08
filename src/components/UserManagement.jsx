@@ -38,14 +38,15 @@ export default function UserManagement() {
   const [activeTab, setActiveTab] = useState("members"); // Add tab state
   const [error, setError] = useState("");
   
-  // Position-related state
-  const [positions, setPositions] = useState([]);
-  const [positionName, setPositionName] = useState("");
-  const [positionDescription, setPositionDescription] = useState("");
-  const [positionHourlyRate, setPositionHourlyRate] = useState("");
-  const [positionColor, setPositionColor] = useState("#3B82F6");
-  const [editingPositionId, setEditingPositionId] = useState(null);
-  const [showPositionModal, setShowPositionModal] = useState(false);
+  // Role-related state
+  const [roles, setRoles] = useState([]);
+  const [roleName, setRoleName] = useState("");
+  const [roleDescription, setRoleDescription] = useState("");
+  const [roleHourlyRate, setRoleHourlyRate] = useState("");
+  const [roleColor, setRoleColor] = useState("#3B82F6");
+  const [editingRoleId, setEditingRoleId] = useState(null);
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [selectedRoleId, setSelectedRoleId] = useState(""); // For user role assignment
   const [editingPin, setEditingPin] = useState(null); // Track which user is being edited
   const [showModal, setShowModal] = useState(false); // Control modal visibility
   const [showRateModal, setShowRateModal] = useState(false); // Control hourly rate modal visibility
@@ -80,10 +81,10 @@ export default function UserManagement() {
     }
   };
 
-  const refreshPositions = async () => {
+  const refreshRoles = async () => {
     setIsLoading(true);
     try {
-      console.log("Fetching positions...");
+      console.log("Fetching roles...");
       const { data, error } = await supabase
         .from('positions')
         .select('*')
@@ -91,18 +92,18 @@ export default function UserManagement() {
         .order('name');
       
       if (error) {
-        console.error("Error fetching positions:", error);
-        setError("Failed to load positions. Please try again.");
-        setPositions([]);
+        console.error("Error fetching roles:", error);
+        setError("Failed to load roles. Please try again.");
+        setRoles([]);
       } else {
-        console.log("Positions fetched:", data);
-        setPositions(data || []);
+        console.log("Roles fetched:", data);
+        setRoles(data || []);
         setError("");
       }
     } catch (err) {
-      console.error("Error fetching positions:", err);
-      setError("Failed to load positions. Please try again.");
-      setPositions([]);
+      console.error("Error fetching roles:", err);
+      setError("Failed to load roles. Please try again.");
+      setRoles([]);
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +116,7 @@ export default function UserManagement() {
         // Make sure tracker is initialized
         await tracker.loadData();
         await refreshUsers();
-        await refreshPositions();
+        await refreshRoles();
       } catch (error) {
         console.error("Error initializing component:", error);
         setError("Failed to initialize. Please refresh the page.");
@@ -324,88 +325,88 @@ export default function UserManagement() {
     setShowModal(true);
   };
 
-  // Position management functions
-  const handleAddPosition = async () => {
+  // Role management functions
+  const handleAddRole = async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('positions')
         .insert([{
-          name: positionName,
-          description: positionDescription,
-          hourly_rate: parseFloat(positionHourlyRate) || 0,
-          color: positionColor
+          name: roleName,
+          description: roleDescription,
+          hourly_rate: parseFloat(roleHourlyRate) || 0,
+          color: roleColor
         }])
         .select();
 
       if (error) {
-        console.error("Error adding position:", error);
-        setError("Failed to add position. Position name might already exist.");
+        console.error("Error adding role:", error);
+        setError("Failed to add role. Role name might already exist.");
         return;
       }
 
-      setPositionName("");
-      setPositionDescription("");
-      setPositionHourlyRate("");
-      setPositionColor("#3B82F6");
+      setRoleName("");
+      setRoleDescription("");
+      setRoleHourlyRate("");
+      setRoleColor("#3B82F6");
       setError("");
-      setShowPositionModal(false);
-      await refreshPositions();
+      setShowRoleModal(false);
+      await refreshRoles();
     } catch (err) {
-      console.error("Error adding position:", err);
-      setError("Failed to add position. Please try again.");
+      console.error("Error adding role:", err);
+      setError("Failed to add role. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleEditPosition = (position) => {
-    setEditingPositionId(position.id);
-    setPositionName(position.name);
-    setPositionDescription(position.description || "");
-    setPositionHourlyRate(position.hourly_rate.toString());
-    setPositionColor(position.color);
+  const handleEditRole = (role) => {
+    setEditingRoleId(role.id);
+    setRoleName(role.name);
+    setRoleDescription(role.description || "");
+    setRoleHourlyRate(role.hourly_rate.toString());
+    setRoleColor(role.color);
     setError("");
-    setShowPositionModal(true);
+    setShowRoleModal(true);
   };
 
-  const handleUpdatePosition = async () => {
+  const handleUpdateRole = async () => {
     setIsLoading(true);
     try {
       const { error } = await supabase
         .from('positions')
         .update({
-          name: positionName,
-          description: positionDescription,
-          hourly_rate: parseFloat(positionHourlyRate) || 0,
-          color: positionColor
+          name: roleName,
+          description: roleDescription,
+          hourly_rate: parseFloat(roleHourlyRate) || 0,
+          color: roleColor
         })
-        .eq('id', editingPositionId);
+        .eq('id', editingRoleId);
 
       if (error) {
-        console.error("Error updating position:", error);
-        setError("Failed to update position. Position name might already exist.");
+        console.error("Error updating role:", error);
+        setError("Failed to update role. Role name might already exist.");
         return;
       }
 
-      setPositionName("");
-      setPositionDescription("");
-      setPositionHourlyRate("");
-      setPositionColor("#3B82F6");
-      setEditingPositionId(null);
+      setRoleName("");
+      setRoleDescription("");
+      setRoleHourlyRate("");
+      setRoleColor("#3B82F6");
+      setEditingRoleId(null);
       setError("");
-      setShowPositionModal(false);
-      await refreshPositions();
+      setShowRoleModal(false);
+      await refreshRoles();
     } catch (err) {
-      console.error("Error updating position:", err);
-      setError("Failed to update position. Please try again.");
+      console.error("Error updating role:", err);
+      setError("Failed to update role. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDeletePosition = async (positionId) => {
-    if (!window.confirm("Are you sure you want to delete this position? This will remove the position assignment from all team members.")) return;
+  const handleDeleteRole = async (roleId) => {
+    if (!window.confirm("Are you sure you want to delete this role? This will remove the role assignment from all team members.")) return;
     
     setIsLoading(true);
     try {
@@ -413,42 +414,42 @@ export default function UserManagement() {
       const { error } = await supabase
         .from('positions')
         .update({ is_active: false })
-        .eq('id', positionId);
+        .eq('id', roleId);
 
       if (error) {
-        console.error("Error deleting position:", error);
-        setError("Failed to delete position. Please try again.");
+        console.error("Error deleting role:", error);
+        setError("Failed to delete role. Please try again.");
         return;
       }
 
-      await refreshPositions();
+      await refreshRoles();
       setError("");
     } catch (err) {
-      console.error("Error deleting position:", err);
-      setError("Failed to delete position. Please try again.");
+      console.error("Error deleting role:", err);
+      setError("Failed to delete role. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const openAddPositionModal = () => {
-    setPositionName("");
-    setPositionDescription("");
-    setPositionHourlyRate("");
-    setPositionColor("#3B82F6");
-    setEditingPositionId(null);
+  const openAddRoleModal = () => {
+    setRoleName("");
+    setRoleDescription("");
+    setRoleHourlyRate("");
+    setRoleColor("#3B82F6");
+    setEditingRoleId(null);
     setError("");
-    setShowPositionModal(true);
+    setShowRoleModal(true);
   };
 
-  const handleCancelPositionEdit = () => {
-    setPositionName("");
-    setPositionDescription("");
-    setPositionHourlyRate("");
-    setPositionColor("#3B82F6");
-    setEditingPositionId(null);
+  const handleCancelRoleEdit = () => {
+    setRoleName("");
+    setRoleDescription("");
+    setRoleHourlyRate("");
+    setRoleColor("#3B82F6");
+    setEditingRoleId(null);
     setError("");
-    setShowPositionModal(false);
+    setShowRoleModal(false);
   };
 
   // Filter users based on active tab and search term
@@ -499,12 +500,12 @@ export default function UserManagement() {
               ADMIN ({adminCount})
             </button>
             <button
-              onClick={() => setActiveTab("positions")}
+              onClick={() => setActiveTab("roles")}
               className={`py-4 px-1 font-medium text-sm transition-colors nav-tab ${
-                activeTab === "positions" ? "active" : ""
+                activeTab === "roles" ? "active" : ""
               }`}
             >
-              POSITIONS ({positions.length})
+              ROLES ({roles.length})
             </button>
           </nav>
         </div>
@@ -530,15 +531,15 @@ export default function UserManagement() {
           </div>
           
           <div className="flex items-center gap-3">
-            {activeTab === "positions" ? (
+            {activeTab === "roles" ? (
               <button
-                onClick={openAddPositionModal}
+                onClick={openAddRoleModal}
                 className="btn-primary px-4 py-2 font-medium rounded-lg transition-colors flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                ADD POSITION
+                ADD ROLE
               </button>
             ) : (
               <button
@@ -561,7 +562,7 @@ export default function UserManagement() {
         <div className="dash-table-bg rounded-lg shadow-md border border-gray-300 overflow-hidden">
           <div className="px-6 py-4 border-b">
             <h3 className="text-lg font-medium">
-              {activeTab === "positions" ? "Job Positions" : activeTab === "admin" ? "Administrators" : "Team Members"}
+              {activeTab === "roles" ? "Job Roles" : activeTab === "admin" ? "Administrators" : "Team Members"}
             </h3>
           </div>
           
@@ -569,10 +570,10 @@ export default function UserManagement() {
             <table className="w-full">
               <thead className="">
                 <tr>
-                  {activeTab === "positions" ? (
+                  {activeTab === "roles" ? (
                     <>
                       <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                        POSITION
+                        ROLE
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                         DESCRIPTION
@@ -609,60 +610,60 @@ export default function UserManagement() {
                 </tr>
               </thead>
               <tbody className="dash-table-bg divide-y divide-slate-200 dark:divide-slate-700">
-                {activeTab === "positions" ? (
+                {activeTab === "roles" ? (
                   <>
-                    {positions.map((position) => (
-                      <tr key={position.id} className="hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    {roles.map((role) => (
+                      <tr key={role.id} className="hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10">
                               <div 
                                 className="h-10 w-10 rounded-full flex items-center justify-center"
-                                style={{ backgroundColor: position.color }}
+                                style={{ backgroundColor: role.color }}
                               >
                                 <span className="text-sm font-medium text-white">
-                                  {position.name.charAt(0).toUpperCase()}
+                                  {role.name.charAt(0).toUpperCase()}
                                 </span>
                               </div>
                             </div>
                             <div className="ml-4">
                               <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                {position.name}
+                                {role.name}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-sm text-slate-500 dark:text-slate-400">
-                            {position.description || 'No description'}
+                            {role.description || 'No description'}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-slate-900 dark:text-white">
-                            ${position.hourly_rate.toFixed(2)}
+                            ${role.hourly_rate.toFixed(2)}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <div 
                               className="w-6 h-6 rounded-full border border-slate-300"
-                              style={{ backgroundColor: position.color }}
+                              style={{ backgroundColor: role.color }}
                             ></div>
                             <span className="text-sm text-slate-500 dark:text-slate-400">
-                              {position.color}
+                              {role.color}
                             </span>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => handleEditPosition(position)}
+                              onClick={() => handleEditRole(role)}
                               className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                             >
                               Edit
                             </button>
                             <button
-                              onClick={() => handleDeletePosition(position.id)}
+                              onClick={() => handleDeleteRole(role.id)}
                               className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                             >
                               Delete
@@ -671,11 +672,11 @@ export default function UserManagement() {
                         </td>
                       </tr>
                     ))}
-                    {positions.length === 0 && (
+                    {roles.length === 0 && (
                       <tr>
                         <td colSpan="5" className="px-6 py-12 text-center">
                           <div className="text-slate-500 dark:text-slate-400">
-                            No positions found. Create your first position to get started.
+                            No roles found. Create your first role to get started.
                           </div>
                         </td>
                       </tr>
@@ -893,31 +894,31 @@ export default function UserManagement() {
         </div>
       )}
 
-      {/* Position Modal */}
-      {showPositionModal && (
+      {/* Role Modal */}
+      {showRoleModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl w-96 max-w-full">
             <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">
-              {editingPositionId ? "Edit Position" : "Add New Position"}
+              {editingRoleId ? "Edit Role" : "Add New Role"}
             </h3>
             
             <div className="space-y-4">
               <input
-                value={positionName}
-                onChange={(e) => setPositionName(e.target.value)}
-                placeholder="Position Name (e.g., Manager, Cashier, Cook)"
+                value={roleName}
+                onChange={(e) => setRoleName(e.target.value)}
+                placeholder="Role Name (e.g., Manager, Cashier, Cook)"
                 className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <textarea
-                value={positionDescription}
-                onChange={(e) => setPositionDescription(e.target.value)}
-                placeholder="Position Description (optional)"
+                value={roleDescription}
+                onChange={(e) => setRoleDescription(e.target.value)}
+                placeholder="Role Description (optional)"
                 rows="3"
                 className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <input
-                value={positionHourlyRate}
-                onChange={(e) => setPositionHourlyRate(e.target.value)}
+                value={roleHourlyRate}
+                onChange={(e) => setRoleHourlyRate(e.target.value)}
                 placeholder="Default Hourly Rate (USD)"
                 type="number"
                 step="0.01"
@@ -925,18 +926,18 @@ export default function UserManagement() {
               />
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Position Color
+                  Role Color
                 </label>
                 <div className="flex items-center gap-3">
                   <input
                     type="color"
-                    value={positionColor}
-                    onChange={(e) => setPositionColor(e.target.value)}
+                    value={roleColor}
+                    onChange={(e) => setRoleColor(e.target.value)}
                     className="w-12 h-12 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer"
                   />
                   <input
-                    value={positionColor}
-                    onChange={(e) => setPositionColor(e.target.value)}
+                    value={roleColor}
+                    onChange={(e) => setRoleColor(e.target.value)}
                     placeholder="#3B82F6"
                     className="flex-1 p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -947,26 +948,26 @@ export default function UserManagement() {
               
               <div className="flex justify-end space-x-3 mt-6">
                 <button
-                  onClick={handleCancelPositionEdit}
+                  onClick={handleCancelRoleEdit}
                   className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
-                {editingPositionId ? (
+                {editingRoleId ? (
                   <button
-                    onClick={handleUpdatePosition}
+                    onClick={handleUpdateRole}
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Updating..." : "Update Position"}
+                    {isLoading ? "Updating..." : "Update Role"}
                   </button>
                 ) : (
                   <button
-                    onClick={handleAddPosition}
+                    onClick={handleAddRole}
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Adding..." : "Add Position"}
+                    {isLoading ? "Adding..." : "Add Role"}
                   </button>
                 )}
               </div>
