@@ -170,17 +170,22 @@ export default function Dashboard({ user, onLogout }) {
   const toggleBackgroundColorMode = async (mode) => {
     setBackgroundColorMode(mode);
     if (user?.id) {
-      await savePreferences({
+      const result = await savePreferences({
         time_format: timeFormat,
         timezone: selectedTimezone,
         date_format: dateFormat,
         color_mode: mode
       });
+      if (!result.success) {
+        console.error('Failed to save color mode preference:', result.error);
+      }
     }
   };
 
   // Helper function to save preferences with fallback
   const savePreferences = async (preferences) => {
+    console.log('Saving preferences for user:', user.id, preferences);
+    
     try {
       // First try to update existing record
       const { data: updateData, error: updateError } = await supabase
@@ -188,23 +193,33 @@ export default function Dashboard({ user, onLogout }) {
         .update(preferences)
         .eq('user_id', user.id);
       
+      console.log('Update result:', { updateData, updateError });
+      
       if (updateError && updateError.code === 'PGRST116') {
         // No rows updated, try to insert
+        console.log('No existing record found, attempting insert...');
         const { data: insertData, error: insertError } = await supabase
           .from('user_preferences')
           .insert({ ...preferences, user_id: user.id });
         
+        console.log('Insert result:', { insertData, insertError });
+        
         if (insertError) {
+          console.error('Insert failed:', insertError);
           return { success: false, error: insertError };
         }
         
+        console.log('Insert successful');
         return { success: true, data: insertData };
       } else if (updateError) {
+        console.error('Update failed:', updateError);
         return { success: false, error: updateError };
       }
       
+      console.log('Update successful');
       return { success: true, data: updateData };
     } catch (error) {
+      console.error('Unexpected error in savePreferences:', error);
       return { success: false, error };
     }
   };
@@ -213,36 +228,45 @@ export default function Dashboard({ user, onLogout }) {
   const handleTimeFormatChange = async (format) => {
     setTimeFormat(format);
     if (user?.id) {
-      await savePreferences({
+      const result = await savePreferences({
         time_format: format,
         timezone: selectedTimezone,
         date_format: dateFormat,
         color_mode: backgroundColorMode
       });
+      if (!result.success) {
+        console.error('Failed to save time format preference:', result.error);
+      }
     }
   };
 
   const handleTimezoneChange = async (timezone) => {
     setSelectedTimezone(timezone);
     if (user?.id) {
-      await savePreferences({
+      const result = await savePreferences({
         time_format: timeFormat,
         timezone: timezone,
         date_format: dateFormat,
         color_mode: backgroundColorMode
       });
+      if (!result.success) {
+        console.error('Failed to save timezone preference:', result.error);
+      }
     }
   };
 
   const handleDateFormatChange = async (format) => {
     setDateFormat(format);
     if (user?.id) {
-      await savePreferences({
+      const result = await savePreferences({
         time_format: timeFormat,
         timezone: selectedTimezone,
         date_format: format,
         color_mode: backgroundColorMode
       });
+      if (!result.success) {
+        console.error('Failed to save date format preference:', result.error);
+      }
     }
   };
 
