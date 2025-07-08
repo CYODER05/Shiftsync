@@ -134,8 +134,8 @@ export default function KioskTable({ kiosks, onToggleStatus, onDelete }) {
       </div>
 
       {/* Desktop Table View */}
-      <div className="dash-table-bg hidden sm:block rounded-lg overflow-hidden shadow-md border border-gray-300 ">
-        <table className="w-full">
+      <div className="dash-table-bg hidden sm:block rounded-lg overflow-hidden shadow-md border border-gray-300">
+        <table className="w-full rounded-lg overflow-hidden">
           <thead>
             <tr>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Name</th>
