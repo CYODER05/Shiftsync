@@ -138,7 +138,7 @@ export default function KioskTable({ kiosks, onToggleStatus, onDelete }) {
         <table className="w-full border border-gray-300 rounded-lg shadow-md bg-white">
           <thead>
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Name</th>
+              <th className="px-4 py-3 text-left text-sm rounded-lg font-medium text-gray-700">Name</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Kiosk ID</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 hidden lg:table-cell">Description</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 hidden lg:table-cell">Location</th>
