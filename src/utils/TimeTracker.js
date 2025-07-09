@@ -883,7 +883,8 @@ export default class TimeTracker {
         pin: user.pin,
         name: user.name,
         email: user.email || "",
-        role: user.role || ""
+        role: user.role || "",
+        role_id: user.role_id || null // Include the role_id field
       }));
     } catch (error) {
       console.error("Error in getUsers:", error);
