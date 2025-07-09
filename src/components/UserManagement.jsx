@@ -86,7 +86,7 @@ export default function UserManagement() {
     try {
       console.log("Fetching roles...");
       const { data, error } = await supabase
-        .from('positions')
+        .from('roles')
         .select('*')
         .eq('is_active', true)
         .order('name');
@@ -155,12 +155,12 @@ export default function UserManagement() {
         return;
       }
 
-      // If a role was selected, update the user's position_id in the database
+      // If a role was selected, update the user's role_id in the database
       if (selectedRoleId) {
         try {
           const { error } = await supabase
             .from('users')
-            .update({ position_id: selectedRoleId })
+            .update({ role_id: selectedRoleId })
             .eq('pin', pin);
           
           if (error) {
@@ -219,7 +219,7 @@ export default function UserManagement() {
         setHourlyRate(0);
       }
       setRole(user.role || ""); // Set role from user data
-      setSelectedRoleId(user.position_id || ""); // Set the selected role ID
+      setSelectedRoleId(user.role_id || ""); // Set the selected role ID
       setShowModal(true); // Show modal for editing
     }
   };
@@ -350,7 +350,7 @@ export default function UserManagement() {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('positions')
+        .from('roles')
         .insert([{
           name: roleName,
           description: roleDescription,
@@ -394,7 +394,7 @@ export default function UserManagement() {
     setIsLoading(true);
     try {
       const { error } = await supabase
-        .from('positions')
+        .from('roles')
         .update({
           name: roleName,
           description: roleDescription,
@@ -432,7 +432,7 @@ export default function UserManagement() {
     try {
       // Soft delete by setting is_active to false
       const { error } = await supabase
-        .from('positions')
+        .from('roles')
         .update({ is_active: false })
         .eq('id', roleId);
 
@@ -741,9 +741,9 @@ export default function UserManagement() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {user.position_id ? (
+                          {user.role_id ? (
                             (() => {
-                              const userRole = roles.find(role => role.id === user.position_id);
+                              const userRole = roles.find(role => role.id === user.role_id);
                               return userRole ? (
                                 <span 
                                   className="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-white"
