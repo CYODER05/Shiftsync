@@ -769,13 +769,13 @@ export default function UserManagement() {
                                 </span>
                               ) : (
                                 <span className="text-sm text-slate-500 dark:text-slate-400">
-                                  {userRole.name}
+                                  {userRole.name || "No Role Assigned"}
                                 </span>
                               );
                             })()
                           ) : (
                             <span className="text-sm text-slate-500 dark:text-slate-400">
-                              {userRole.name}
+                              {userRole.name || "No Role Assigned"}
                             </span>
                           )}
                         </td>
