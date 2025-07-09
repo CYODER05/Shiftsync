@@ -232,10 +232,26 @@ export default function UserManagement() {
         setError("Failed to update user. PIN might already exist or input is invalid.");
         return;
       }
+
+      // Update the user's role_id in the database
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ role_id: selectedRoleId || null })
+          .eq('pin', pin);
+        
+        if (error) {
+          console.error("Error updating user role:", error);
+        }
+      } catch (roleError) {
+        console.error("Error updating user role:", roleError);
+      }
+
       setName("");
       setPin("");
       setHourlyRate("");
       setRole("");
+      setSelectedRoleId("");
       setError("");
       setEditingPin(null); // Exit edit mode
       setShowModal(false); // Close modal after successful update
